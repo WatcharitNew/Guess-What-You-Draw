@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { HomePage } from './components/HomePage/HomePage';
 import { GamePage } from './components/GamePage/GamePage';
+import { TestMessageSocket } from './components/TestMessageSocket/TestMessageSocket';
 import './App.css';
 
 interface IApp {}
@@ -11,6 +12,7 @@ const App: React.FC<IApp> = () => {
 		<main>
 			<Switch>
 				<Route exact path='/' component={HomePage} />
+				<Route path='/test' component={TestMessageSocket} />
 				<Route path='/:roomId' component={GamePage} />
 			</Switch>
 		</main>

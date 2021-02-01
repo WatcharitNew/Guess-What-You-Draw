@@ -106,6 +106,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.5.2)
     rack (2.2.3)
+    rack-cors (1.1.1)
+      rack (>= 2.0.0)
     rack-mini-profiler (2.3.1)
       rack (>= 1.2.0)
     rack-proxy (0.6.5)
@@ -139,6 +141,7 @@ GEM
       rake (>= 0.8.7)
       thor (~> 1.0)
     rake (13.0.3)
+    redis (4.2.5)
     regexp_parser (2.0.3)
     rubyzip (2.3.0)
     sass-rails (6.0.0)
@@ -202,8 +205,10 @@ DEPENDENCIES
   capybara (>= 3.26)
   jbuilder (~> 2.7)
   puma (~> 5.0)
+  rack-cors
   rack-mini-profiler (~> 2.0)
   rails (~> 6.1.1)
+  redis (~> 4.0)
   sass-rails (>= 6)
   selenium-webdriver
   sqlite3 (~> 1.4)
