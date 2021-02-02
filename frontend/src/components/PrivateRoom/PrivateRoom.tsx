@@ -11,5 +11,6 @@ interface IPrivateRoom extends RouteComponentProps<RouteParams> {}
 export const PrivateRoom: React.FC<IPrivateRoom> = (props) => {
     const room = props.match.params.room;
     const userName = sessionStorage.getItem("userName");
+    console.log(styles); // remove this;
 	return <div>Room {room} Username {userName}</div>;
 };

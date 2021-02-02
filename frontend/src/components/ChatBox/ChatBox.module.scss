@@ -1,0 +1,50 @@
+@import '../variable.scss';
+
+:local(.background) {
+    background-color: rgba($white, 0.5);
+    border-radius: 24px;
+    padding: 16px;
+}
+
+:local(.chatMessage) {
+    margin-top: 8px;
+}
+
+:local(.chatOtherUserName) {
+    font-size: 18px;
+}
+
+:local(.chatContent) {
+    padding: 8px 16px;
+    border-radius: 24px;
+    width: fit-content;
+    margin-top: 4px;
+    max-width: 100%;
+    word-break: break-all;
+}
+
+:local(.chatUserContent) {
+    margin-left: auto;
+    background-color: $orange;
+    color: $white;
+}
+
+:local(.chatOtherContent) {
+    margin-left: 8px;
+    background-color: $white;
+}
+
+:local(.chatSystemContent) {
+    background-color: rgba($black, 0.25);
+    color: $white;
+    padding: 8px 16px;
+    border-radius: 24px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+:local(.chatMessages) {
+    height: 90%;
+    overflow: auto;
+}

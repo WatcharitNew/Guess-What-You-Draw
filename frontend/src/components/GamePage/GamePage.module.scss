@@ -1,0 +1,11 @@
+@import '../variable.scss';
+
+:local(.background) {
+    display: flex;
+    background-color: $yellow;
+}
+
+:local(.chatBox) {
+    width: 312px;
+    height: 568px;
+}
