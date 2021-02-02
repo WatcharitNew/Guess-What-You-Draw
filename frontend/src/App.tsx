@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { HomePage } from './components/HomePage/HomePage';
 import { GamePage } from './components/GamePage/GamePage';
-import ChatBox from './components/TestPage/ChatBox';
+import { ChatBox } from './components/TestPage/ChatBox';
 import './App.css';
 
 interface IApp {}

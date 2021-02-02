@@ -1,29 +1,69 @@
-import React from 'react';
+import { Button, TextField } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import consumer from '../cable';
 
-export default class ChatBox extends React.Component {
-    componentDidMount() {
-        consumer.subscriptions.create({
-            channel: 'ChatChannel',
-            }, {
-            received: (data: any) => console.log(data),
-            connected: () => console.log('aaconnected'),
-            disconnected: () => console.log('bbdisconnected'),
+interface IMessage {
+    content: string
+}
+
+export const ChatBox: React.FC<any> = () => {
+    const [messageChannel, setMessageChannel] = useState<any>();
+    const [messages, setMessages] = useState<IMessage[]>([]);
+    const [chatMessage, setChatMessage] = useState<string>('');
+    const [room, setRoom] = useState<string>('123');
+    useEffect( () => {
+        setMessageChannel(
+            consumer.subscriptions.create(
+                {
+                    channel: 'ChatChannel',
+                    user: 'User1',
+                    room: room ? room : null,
+                }, 
+                {
+                    received: (data: IMessage) => handleReceived(data),
+                    connected: () => console.log('connected'),
+                    disconnected: () => console.log('disconnected'),
+                }
+            )
+        );
+    }
+    , [room]);
+
+    const handleReceived = (data: IMessage) => {
+        if(data.content) {
+            setMessages((messages: IMessage[]) => ([...messages, data]));
         }
-        )
-    };
+    }
     
-    handleSubmit = () => {  
-    fetch('http://localhost:3000/messages', {
-        method: 'POST',
-        body: JSON.stringify({
-            content: 'Hi!',
-            username: 'cool_kid_20'
-          })
-    })
+    const handleSubmit = () => {
+        messageChannel.send({content: chatMessage});
+        setChatMessage('');
     }
 
-    render() {
-        return <button value="hey" onClick={this.handleSubmit}>hey</button>;
+    const handleChange = (e:any) => {
+        setChatMessage(e.target.value)
     }
+
+    const changeRoom = () => {
+        messageChannel.unsubscribe();
+        if(room === '123') setRoom('456');
+        else if(room === '456') setRoom('');
+        else setRoom('123');
+    }
+
+    return (
+        <div>
+            <div>{room ? `Room ${room}` : 'Public chat'}</div>
+            {messages.map((message: IMessage, idx: number) => 
+                <div key={idx}>
+                    {message.content}
+                </div>
+            )}
+            <form noValidate autoComplete="off">
+                <TextField id="standard-basic" label="Standard" onChange={handleChange} value={chatMessage}/>
+                <Button variant="contained" color="primary" onClick={handleSubmit}>Send</Button>
+                <Button variant="contained" color="primary" onClick={changeRoom}>Change Room</Button>
+            </form>
+        </div>
+    );
 };
