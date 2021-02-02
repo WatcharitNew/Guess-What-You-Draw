@@ -36,6 +36,7 @@ export const ChatBox: React.FC<any> = () => {
     }
     
     const handleSubmit = () => {
+        if(chatMessage === '') return;
         messageChannel.send({content: chatMessage});
         setChatMessage('');
     }
@@ -51,6 +52,13 @@ export const ChatBox: React.FC<any> = () => {
         else setRoom('123');
     }
 
+    const handleKeyPress = (ev: any) => {
+		if (ev.key === 'Enter') {
+			handleSubmit();
+			ev.preventDefault();
+		}
+	}
+
     return (
         <div>
             <div>{room ? `Room ${room}` : 'Public chat'}</div>
@@ -60,7 +68,7 @@ export const ChatBox: React.FC<any> = () => {
                 </div>
             )}
             <form noValidate autoComplete="off">
-                <TextField id="standard-basic" label="Standard" onChange={handleChange} value={chatMessage}/>
+                <TextField id="standard-basic" label="Standard" onChange={handleChange} value={chatMessage} onKeyPress={handleKeyPress}/>
                 <Button variant="contained" color="primary" onClick={handleSubmit}>Send</Button>
                 <Button variant="contained" color="primary" onClick={changeRoom}>Change Room</Button>
             </form>

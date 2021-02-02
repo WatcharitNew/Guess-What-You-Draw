@@ -1,8 +1,10 @@
 @import '../variable.scss';
 
+
 :local(.background) {
     background-color: $yellow;
-    height: 100vh;
+    min-height: 100vh;
+    min-width: 100vw;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -11,6 +13,7 @@
 :local(.titleSection) {
     display: flex;
     justify-content: center;
+    max-height: 30vh;
 }
 
 :local(.titleRectangle) {
@@ -42,7 +45,7 @@
     background-color: $orange;
     width: 18vh;
     height: 18vh;
-    margin-top: 16px;
+    margin-top: 3vh;
     z-index: 5;
 }
 
@@ -52,8 +55,8 @@
     height: 22vh;
     border-radius: 100%;
     z-index: 7;
-    margin-left: -64px;
-    margin-top: 88px;
+    margin-left: -9vh;
+    margin-top: 12vh;
 }
 
 :local(.midTriangle) {
@@ -67,20 +70,20 @@
     border-bottom-width: 21vh;
     border-bottom-color: $purple;
     z-index: 6;
-    margin-left: -88px;
+    margin-left: -12vh;
 }
 
 :local(.inputName) {
     color: $white !important;
     text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.5) !important;
     font-size: 24px !important;
-    width: 30vw;
+    width: calc(20vw + 100px)
 }
 
 :local(.playButton) {
     margin-top: 32px !important;
     background-color: $purple !important;
-    font-size: 36px !important;
-    width: 20vw;
+    font-size: 28px !important;
+    width: fit-content;
     border-radius: 12px !important;
 }
