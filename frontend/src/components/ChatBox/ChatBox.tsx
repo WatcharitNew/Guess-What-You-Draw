@@ -1,5 +1,5 @@
-import { Button, TextField } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import { InputBase } from '@material-ui/core';
+import React, { useEffect, useRef, useState } from 'react';
 import consumer from '../cable';
 import styles from './ChatBox.module.scss';
 import classnames from 'classnames'
@@ -20,6 +20,8 @@ export const ChatBox: React.FC<IChatBox> = (props) => {
     const [messageChannel, setMessageChannel] = useState<any>();
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [chatMessage, setChatMessage] = useState<string>('');
+
+
     useEffect( () => {
         setMessageChannel(
             consumer.subscriptions.create(
@@ -30,17 +32,18 @@ export const ChatBox: React.FC<IChatBox> = (props) => {
                 }, 
                 {
                     received: (data: IMessage) => handleReceived(data),
-                    connected: () => console.log('connected'),
-                    disconnected: () => console.log('disconnected'),
+                    // connected: () => console.log('connected'),
+                    // disconnected: () => console.log('disconnected'),
                 }
             )
         );
     }
-    , [room]);
+    , [room, userName]);
 
     const handleReceived = (data: IMessage) => {
         if(data.content) {
             setMessages((messages: IMessage[]) => ([...messages, data]));
+            scrollToBottom();
         }
     }
     
@@ -59,22 +62,38 @@ export const ChatBox: React.FC<IChatBox> = (props) => {
 			handleSubmit();
 			ev.preventDefault();
 		}
-	}
+    }
+    
+    const messagesEndRef:any = useRef(null);
+    const chatMessages = messages.map((message: IMessage, idx: number) => 
+        <ChatMessage
+            message={message}
+            userName={userName}
+        />
+    );
+
+    const scrollToBottom = () => {
+        messagesEndRef?.current?.scrollIntoView({ behavior: 'smooth' })
+    }
 
     return (
         <div className={classnames(styles.background, className)}>
             <div className={styles.chatMessages}>
-                {messages.map((message: IMessage, idx: number) => 
-                    <ChatMessage
-                        message={message}
-                        userName={userName}
-                    />
-                )}
+                {chatMessages}
+                <div ref={messagesEndRef} />
             </div>
-            <form noValidate autoComplete="off">
-                <TextField id="standard-basic" placeholder="Type something..." onChange={handleChange} value={chatMessage} onKeyPress={handleKeyPress}/>
-                <Button variant="contained" color="primary" onClick={handleSubmit}>Send</Button>
-            </form>
+            <div className={styles.footer}>
+                <form className={styles.textFieldWrapper} noValidate autoComplete="off">
+                    <InputBase 
+                        className={styles.textField} 
+                        placeholder="Type something..." 
+                        onChange={handleChange} 
+                        value={chatMessage} 
+                        inputProps={{ 'aria-label': 'naked' }}
+                        onKeyPress={handleKeyPress}
+                    />
+                </form>
+            </div>
         </div>
     );
 };
@@ -88,7 +107,6 @@ export const ChatMessage: React.FC<IChatMessage> = (props) => {
     const { message, userName} = props
     const { sender, content } = message;
 
-    console.log(message);
     const isUserSent = sender === userName;
     const chatContentStyle = !sender ? styles.chatSystemContent
         : isUserSent ? classnames(styles.chatContent, styles.chatUserContent)

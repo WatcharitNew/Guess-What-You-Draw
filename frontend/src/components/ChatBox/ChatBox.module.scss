@@ -3,7 +3,9 @@
 :local(.background) {
     background-color: rgba($white, 0.5);
     border-radius: 24px;
-    padding: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 :local(.chatMessage) {
@@ -47,4 +49,37 @@
 :local(.chatMessages) {
     height: 90%;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+
+    > :first-child {
+        margin-top: auto;
+    }
+}
+
+:local(.textField) {
+    width: 100%;
+}
+
+:local(.footer) {
+    background-color: $white;
+    height: 10%;
+    width: calc(100% + 32px);
+    margin-left: -16px;
+    margin-top: 16px;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-self: flex-end;
+}
+
+:local(.textFieldWrapper) {
+    background-color: rgba($black, 0.1);
+    padding: 4px 16px;
+    border-radius: 24px;
+    width: 75%;
 }
