@@ -1,9 +1,10 @@
 import { Button, Slider } from '@material-ui/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router';
-import { ChatBox } from '../ChatBox/ChatBox';
+import { ChatBox, IMessage } from '../ChatBox/ChatBox';
 import styles from './PrivateRoom.module.scss';
 import { UserBox } from './UserBox';
+import consumer from '../cable';
 
 interface RouteParams {
 	room: string;
@@ -42,7 +43,9 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
     const { players } = mockData;
 
     const room = props.match.params.room;
-    const userName = sessionStorage.getItem("userName") || '';
+    const username = sessionStorage.getItem("username") || '';
+    const [messageChannel, setMessageChannel] = useState<any>();
+    const [messages, setMessages] = useState<IMessage[]>([]);
 
     const history = useHistory();
     const handleStart = () => {
@@ -50,11 +53,10 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 		history.go(0);
     }
 
-    const inviteLink = `http://localhost:3000/room/${room}`
+    const inviteLink = window.location.href;
     const copyToClipboard = () => {
         navigator.clipboard.writeText(inviteLink);
     };
-
 
     const roundsSliderMarks: sliderMark[] = [
         {
@@ -85,6 +87,35 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
           label: '60',
         },
     ];
+
+    useEffect( () => {
+        setMessageChannel(
+            consumer.subscriptions.create(
+                {
+                    channel: 'ChatChannel',
+                    username,
+                    room,
+                }, 
+                {
+                    received: (data: IMessage) => handleReceived(data),
+                    // connected: () => console.log('connected'),
+                    // disconnected: () => console.log('disconnected'),
+                }
+            )
+        );
+    }
+    , [room, username]);
+
+    const handleReceived = (data: IMessage) => {
+        console.log(data);
+        if(data.type === 'message') {
+            setMessages((messages: IMessage[]) => ([...messages, data]));
+        }
+    }
+    
+    const onSubmitChat = (chatMessage: string) => {
+        messageChannel.send({content: chatMessage});
+    }
 
 	return (
         <div className={styles.background}>
@@ -125,8 +156,9 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
                 </div>
                 <ChatBox
                     className={styles.chatBox}
-                    room={room}
-                    userName={userName}
+                    username={username}
+                    messages={messages}
+                    onSubmit={onSubmitChat}
                 />
                 <div className={styles.players}>
                     <span className={styles.midText}>Players</span>
@@ -136,7 +168,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
                                 key={idx}
                                 name={player.name}
                                 isLeader={player.isLeader} 
-                                isUser={userName === player.name}
+                                isUser={username === player.name}
                             />
                         )}
                     </div>

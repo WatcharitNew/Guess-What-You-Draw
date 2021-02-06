@@ -13,10 +13,10 @@ interface IHomePage extends RouteComponentProps<RouteParams> {}
 export const HomePage: React.FC<IHomePage> = (props) => {
 	const room = props.match.params.room;
 	const history = useHistory();
-	const [userName,SetUserName] = useState<string>('');
+	const [username,SetUserName] = useState<string>('');
 
 	const onSubmit = () => {
-		sessionStorage.setItem("userName", userName);
+		sessionStorage.setItem("username", username);
 		if(room) {
 			history.push(`/room/${room}`);
 		}
@@ -55,7 +55,7 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 					className={styles.inputName} 
 					placeholder="Input your name" 
 					onKeyPress={handleKeyPress} 
-					value={userName} 
+					value={username} 
 					onChange={(ev: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => handleChangeName(ev.target.value)}
 				/>
 			</form>
