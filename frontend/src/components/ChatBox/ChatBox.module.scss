@@ -56,6 +56,10 @@
     > :first-child {
         margin-top: auto;
     }
+
+    > :last-child {
+        margin-top: 2vh;
+    }
 }
 
 :local(.textField) {
@@ -64,10 +68,9 @@
 
 :local(.footer) {
     background-color: $white;
-    height: 10%;
+    height: 12%;
     width: calc(100% + 32px);
     margin-left: -16px;
-    margin-top: 16px;
     border-bottom-left-radius: 24px;
     border-bottom-right-radius: 24px;
 
@@ -79,7 +82,8 @@
 
 :local(.textFieldWrapper) {
     background-color: rgba($black, 0.1);
-    padding: 4px 16px;
+    margin: 4px 16px;
+    padding-left: 16px;
     border-radius: 24px;
-    width: 75%;
+    width: 80%;
 }

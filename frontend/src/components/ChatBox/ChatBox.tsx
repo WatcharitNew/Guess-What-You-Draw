@@ -67,6 +67,7 @@ export const ChatBox: React.FC<IChatBox> = (props) => {
     const messagesEndRef:any = useRef(null);
     const chatMessages = messages.map((message: IMessage, idx: number) => 
         <ChatMessage
+            key={idx}
             message={message}
             userName={userName}
         />
