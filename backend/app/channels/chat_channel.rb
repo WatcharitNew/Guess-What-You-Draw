@@ -1,4 +1,10 @@
 class ChatChannel < ApplicationCable::Channel
+  # redis
+  # {
+  #   room => {
+  #     usernames: string[],
+  #   }
+  # }
 
   def subscribed
     room = params[:room]
@@ -15,14 +21,13 @@ class ChatChannel < ApplicationCable::Channel
     $redis.set(room, {usernames: usernames}.to_json)
 
     stream_from "#{room}"
-    ActionCable.server.broadcast "#{room}", {type: 'getUsers', content: usernames}
-    ActionCable.server.broadcast "#{room}", {type: 'message', content: "#{username} joined"}
+    ActionCable.server.broadcast "#{room}", {type: 'getUsers', usernames: usernames}
+    ActionCable.server.broadcast "#{room}", {type: 'recieve-message', content: "#{username} joined"}
   end
 
   def receive(data)
-    content = data['content']
-    if params[:room]
-      ActionCable.server.broadcast("#{params[:room]}", {type: 'message', sender: params[:username], content: content})
+    if data['type'] == 'send-message'
+      ActionCable.server.broadcast("#{params[:room]}", {type: 'recieve-message', sender: params[:username], content: data['content']})
     end
   end
 
@@ -39,6 +44,7 @@ class ChatChannel < ApplicationCable::Channel
     end
     $redis.set(room, {usernames: usernames}.to_json)
 
-    ActionCable.server.broadcast "#{params[:room]}", {content: "#{username} left"}
+    ActionCable.server.broadcast "#{room}", {type: 'getUsers', usernames: usernames}
+    ActionCable.server.broadcast "#{params[:room]}", {type: 'recieve-message', content: "#{username} left"}
   end
 end

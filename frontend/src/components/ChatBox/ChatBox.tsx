@@ -4,7 +4,6 @@ import styles from './ChatBox.module.scss';
 import classnames from 'classnames'
 
 export interface IMessage {
-    type: string,
     sender: string,
     content: string,
 }

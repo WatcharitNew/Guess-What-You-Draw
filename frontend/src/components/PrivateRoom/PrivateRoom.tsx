@@ -10,7 +10,7 @@ interface RouteParams {
 	room: string;
 }
 
-interface player {
+interface IPlayer {
     name: string;
     isLeader: boolean;
 }
@@ -23,29 +23,11 @@ interface sliderMark {
 interface IPrivateRoom extends RouteComponentProps<RouteParams> {}
 
 export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
-    const mockData = { // todo: remove this
-        players: [
-            {
-                name: 'Leader',
-                isLeader: true,
-            },
-            {
-                name: 'shiba',
-                isLeader: false,
-            },
-            {
-                name: 'akita',
-                isLeader: false,
-            },
-        ],
-    };
-
-    const { players } = mockData;
-
     const room = props.match.params.room;
     const username = sessionStorage.getItem("username") || '';
     const [messageChannel, setMessageChannel] = useState<any>();
     const [messages, setMessages] = useState<IMessage[]>([]);
+    const [players, setPlayers] = useState<IPlayer[]>([]);
 
     const history = useHistory();
     const handleStart = () => {
@@ -106,15 +88,22 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
     }
     , [room, username]);
 
-    const handleReceived = (data: IMessage) => {
+    const handleReceived = (data: any) => {
         console.log(data);
-        if(data.type === 'message') {
-            setMessages((messages: IMessage[]) => ([...messages, data]));
+        if(data.type === 'recieve-message') {
+            setMessages((messages: IMessage[]) => ([...messages, {sender: data.sender, content: data.content}]));
+        }
+        else if(data.type === 'getUsers') {
+            const usernames = data.usernames;
+            console.log(usernames);
+            setPlayers(usernames.map((username: string, idx: number) => { 
+                return {name: username, isLeader: idx===0} // assume that first member will be leader? not sure if this work
+            }))
         }
     }
     
     const onSubmitChat = (chatMessage: string) => {
-        messageChannel.send({content: chatMessage});
+        messageChannel.send({type:'send-message', content: chatMessage});
     }
 
 	return (
@@ -163,7 +152,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
                 <div className={styles.players}>
                     <span className={styles.midText}>Players</span>
                     <div className={styles.userBoxs}>
-                        {players.map((player: player, idx: number) => 
+                        {players.map((player: IPlayer, idx: number) => 
                             <UserBox
                                 key={idx}
                                 name={player.name}

@@ -37,15 +37,15 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
     }
     , [room, username]);
 
-    const handleReceived = (data: IMessage) => {
+    const handleReceived = (data: any) => {
         console.log(data);
-        if(data.type === 'message') {
+        if(data.type === 'recieve-message') {
             setMessages((messages: IMessage[]) => ([...messages, data]));
         }
     }
     
     const onSubmitChat = (chatMessage: string) => {
-        messageChannel.send({content: chatMessage});
+        messageChannel.send({type: 'send-message',content: chatMessage});
     }
 
 	return (
