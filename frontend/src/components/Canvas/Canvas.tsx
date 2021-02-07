@@ -1,26 +1,46 @@
+import classNames from 'classnames';
 import React, { useRef, useEffect, useState } from 'react';
+import { ColorCode } from '../util';
+import styles from './Canvas.module.scss';
 
-interface ICanvas {}
+interface ICanvas {
+	color: ColorCode;
+	reset: boolean;
+	setReset: (reset: boolean) => void;
+	className?: string;
+}
+
+const WIDTH = 800;
+const HEIGHT = 520;
 
 export const Canvas: React.FC<ICanvas> = (props) => {
+	const { color, reset, setReset, className } = props;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [canvas, setCanvas] = useState<HTMLCanvasElement>();
 	const [ctx, setCtx] = useState<CanvasRenderingContext2D>();
 	const [isDrawing, setIsDrawing] = useState<boolean>(false);
 
 	useEffect(() => {
-		const canvasCurrent = canvasRef.current;
-		canvasCurrent && setCanvas(canvasCurrent);
-		const context = canvas?.getContext('2d');
-		context && setCtx(context);
-	}, [canvas]);
+		if (!ctx) {
+			const canvasCurrent = canvasRef.current;
+			canvasCurrent && setCanvas(canvasCurrent);
+			const context = canvas?.getContext('2d');
+			context && setCtx(context);
+		}
+
+		if (reset) {
+			ctx?.clearRect(0, 0, WIDTH, HEIGHT);
+			setReset(false);
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [canvas, reset]);
 
 	const startDrawing = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
 		if (ctx && canvas) {
 			ctx.lineJoin = 'round';
 			ctx.lineCap = 'round';
-			ctx.lineWidth = 5;
-			ctx.strokeStyle = '#000000';
+			ctx.lineWidth = color === '#ffffff' ? 15 : 5;
+			ctx.strokeStyle = color;
 			ctx.beginPath();
 			ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
 			setIsDrawing(true);
@@ -52,12 +72,13 @@ export const Canvas: React.FC<ICanvas> = (props) => {
 	return (
 		<canvas
 			ref={canvasRef}
-			width={500}
-			height={500}
+			width={WIDTH}
+			height={HEIGHT}
 			onMouseDown={startDrawing}
 			onMouseUp={stopDrawing}
 			onMouseOut={stopDrawing}
 			onMouseMove={handleMouseMove}
+			className={classNames(styles.canvas, className)}
 		/>
 	);
 };
