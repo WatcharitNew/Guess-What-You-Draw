@@ -26,8 +26,9 @@ class ChatChannel < ApplicationCable::Channel
   end
 
   def receive(data)
+    room = params[:room]
     if data['type'] == 'send-message'
-      ActionCable.server.broadcast("#{params[:room]}", {type: 'recieve-message', sender: params[:username], content: data['content']})
+      ActionCable.server.broadcast("#{room}", {type: 'recieve-message', sender: params[:username], content: data['content']})
     end
   end
 

@@ -95,10 +95,9 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
         }
         else if(data.type === 'getUsers') {
             const usernames = data.usernames;
-            console.log(usernames);
-            setPlayers(usernames.map((username: string, idx: number) => { 
-                return {name: username, isLeader: idx===0} // assume that first member will be leader? not sure if this work
-            }))
+            // assume that first member will be leader? not sure if this work
+            const newPlayers:IPlayer[] = usernames.map((username: string, idx: number) => ({name: username, isLeader: idx===0}));
+            setPlayers(newPlayers);
         }
     }
     

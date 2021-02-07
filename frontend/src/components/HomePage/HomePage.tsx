@@ -3,6 +3,7 @@ import styles from './HomePage.module.scss';
 import classNames from 'classnames';
 import { Button, TextField } from '@material-ui/core';
 import { RouteComponentProps, useHistory } from 'react-router';
+import axios from 'axios'
 
 interface RouteParams {
 	room: string,
@@ -19,12 +20,18 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 		sessionStorage.setItem("username", username);
 		if(room) {
 			history.push(`/room/${room}`);
+			history.go(0);
 		}
 		else {
-			const newRoom = '123'; //todo
-			history.push(`/room/${newRoom}`);
+			axios.post('http://localhost:10000/room')
+				.then(res => {
+					if(res.data.room) {
+						console.log(res.data.room)
+						history.push(`/room/${res.data.room}`);
+						history.go(0);
+					}
+			})
 		}
-		history.go(0);
 	}
 
 	const handleKeyPress = (ev: any) => {
