@@ -1,15 +1,16 @@
 import { Button, Slider } from '@material-ui/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { RouteComponentProps, useHistory } from 'react-router';
-import { ChatBox } from '../ChatBox/ChatBox';
+import { ChatBox, IMessage } from '../ChatBox/ChatBox';
 import styles from './PrivateRoom.module.scss';
 import { UserBox } from './UserBox';
+import consumer from '../cable';
 
 interface RouteParams {
 	room: string;
 }
 
-interface player {
+interface IPlayer {
     name: string;
     isLeader: boolean;
 }
@@ -22,27 +23,11 @@ interface sliderMark {
 interface IPrivateRoom extends RouteComponentProps<RouteParams> {}
 
 export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
-    const mockData = { // todo: remove this
-        players: [
-            {
-                name: 'Leader',
-                isLeader: true,
-            },
-            {
-                name: 'shiba',
-                isLeader: false,
-            },
-            {
-                name: 'akita',
-                isLeader: false,
-            },
-        ],
-    };
-
-    const { players } = mockData;
-
     const room = props.match.params.room;
-    const userName = sessionStorage.getItem("userName") || '';
+    const username = sessionStorage.getItem("username") || '';
+    const [messageChannel, setMessageChannel] = useState<any>();
+    const [messages, setMessages] = useState<IMessage[]>([]);
+    const [players, setPlayers] = useState<IPlayer[]>([]);
 
     const history = useHistory();
     const handleStart = () => {
@@ -50,11 +35,10 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 		history.go(0);
     }
 
-    const inviteLink = `http://localhost:3000/room/${room}`
+    const inviteLink = window.location.href;
     const copyToClipboard = () => {
         navigator.clipboard.writeText(inviteLink);
     };
-
 
     const roundsSliderMarks: sliderMark[] = [
         {
@@ -85,6 +69,42 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
           label: '60',
         },
     ];
+
+    useEffect( () => {
+        setMessageChannel(
+            consumer.subscriptions.create(
+                {
+                    channel: 'ChatChannel',
+                    username,
+                    room,
+                }, 
+                {
+                    received: (data: IMessage) => handleReceived(data),
+                    // connected: () => console.log('connected'),
+                    // disconnected: () => console.log('disconnected'),
+                }
+            )
+        );
+    }
+    , [room, username]);
+
+    const handleReceived = (data: any) => {
+        console.log(data);
+        if(data.type === 'recieve-message') {
+            setMessages((messages: IMessage[]) => ([...messages, {sender: data.sender, content: data.content}]));
+        }
+        else if(data.type === 'getUsers') {
+            const usernames = data.usernames;
+            console.log(usernames);
+            setPlayers(usernames.map((username: string, idx: number) => { 
+                return {name: username, isLeader: idx===0} // assume that first member will be leader? not sure if this work
+            }))
+        }
+    }
+    
+    const onSubmitChat = (chatMessage: string) => {
+        messageChannel.send({type:'send-message', content: chatMessage});
+    }
 
 	return (
         <div className={styles.background}>
@@ -125,18 +145,19 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
                 </div>
                 <ChatBox
                     className={styles.chatBox}
-                    room={room}
-                    userName={userName}
+                    username={username}
+                    messages={messages}
+                    onSubmit={onSubmitChat}
                 />
                 <div className={styles.players}>
                     <span className={styles.midText}>Players</span>
                     <div className={styles.userBoxs}>
-                        {players.map((player: player, idx: number) => 
+                        {players.map((player: IPlayer, idx: number) => 
                             <UserBox
                                 key={idx}
                                 name={player.name}
                                 isLeader={player.isLeader} 
-                                isUser={userName === player.name}
+                                isUser={username === player.name}
                             />
                         )}
                     </div>

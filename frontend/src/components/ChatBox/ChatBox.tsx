@@ -1,57 +1,28 @@
 import { InputBase } from '@material-ui/core';
 import React, { useEffect, useRef, useState } from 'react';
-import consumer from '../cable';
 import styles from './ChatBox.module.scss';
 import classnames from 'classnames'
 
-interface IMessage {
+export interface IMessage {
     sender: string,
     content: string,
 }
 
 interface IChatBox {
-    room: string,
-    userName: string,
     className?: string,
+    username: string,
+    messages: IMessage[],
+    onSubmit: (chatMessage: string) => void,
 }
 
 export const ChatBox: React.FC<IChatBox> = (props) => {
-    const {room, userName, className} = props;
-    const [messageChannel, setMessageChannel] = useState<any>();
-    const [messages, setMessages] = useState<IMessage[]>([]);
+    const {username, className, messages, onSubmit} = props;
     const [chatMessage, setChatMessage] = useState<string>('');
 
-
     useEffect( () => {
-        setMessageChannel(
-            consumer.subscriptions.create(
-                {
-                    channel: 'ChatChannel',
-                    userName,
-                    room,
-                }, 
-                {
-                    received: (data: IMessage) => handleReceived(data),
-                    // connected: () => console.log('connected'),
-                    // disconnected: () => console.log('disconnected'),
-                }
-            )
-        );
+        scrollToBottom();
     }
-    , [room, userName]);
-
-    const handleReceived = (data: IMessage) => {
-        if(data.content) {
-            setMessages((messages: IMessage[]) => ([...messages, data]));
-            scrollToBottom();
-        }
-    }
-    
-    const handleSubmit = () => {
-        if(chatMessage === '') return;
-        messageChannel.send({content: chatMessage});
-        setChatMessage('');
-    }
+    , [messages]);
 
     const handleChange = (e:any) => {
         setChatMessage(e.target.value)
@@ -63,13 +34,19 @@ export const ChatBox: React.FC<IChatBox> = (props) => {
 			ev.preventDefault();
 		}
     }
+
+    const handleSubmit = () => {
+        if(chatMessage === '') return;
+        onSubmit(chatMessage);
+        setChatMessage('');
+    }
     
     const messagesEndRef:any = useRef(null);
     const chatMessages = messages.map((message: IMessage, idx: number) => 
         <ChatMessage
             key={idx}
             message={message}
-            userName={userName}
+            username={username}
         />
     );
 
@@ -101,14 +78,14 @@ export const ChatBox: React.FC<IChatBox> = (props) => {
 
 interface IChatMessage {
     message: IMessage,
-    userName: string, // current user *not* the message's sender
+    username: string, // current user *not* the message's sender
 }
 
 export const ChatMessage: React.FC<IChatMessage> = (props) => {
-    const { message, userName} = props
+    const { message, username} = props
     const { sender, content } = message;
 
-    const isUserSent = sender === userName;
+    const isUserSent = sender === username;
     const chatContentStyle = !sender ? styles.chatSystemContent
         : isUserSent ? classnames(styles.chatContent, styles.chatUserContent)
         : classnames(styles.chatContent, styles.chatOtherContent);
