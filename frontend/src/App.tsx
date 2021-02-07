@@ -15,7 +15,7 @@ const App: React.FC<IApp> = () => {
 				<Route path='/home/:room' component={HomePage} />
 				<Route path='/game/:room' component={GamePage} />
 				<Route path='/room/:room' component={PrivateRoom} />
-				<Route render={() => <Redirect to="/home" />} />
+				<Route render={() => <Redirect to='/home' />} />
 			</Switch>
 		</main>
 	);
