@@ -1,140 +1,111 @@
 @import '../variable.scss';
 
 :local(.background) {
-    background-color: $yellow;
-    min-height: 100vh;
-    min-width: 100vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	background-color: $yellow;
+	min-height: 100vh;
+	min-width: 100vw;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 :local(.inviteLinkSection) {
-    margin-top: 2vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+	margin-top: 2vh;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 :local(.inviteText) {
-    color: $white;
-    font-size: 24px;
-    text-shadow:
-        0px 4px 4px rgba(0, 0, 0, 0.5),
-        -1px -1px 0 #000,  
-        1px -1px 0 #000,
-        -1px 1px 0 #000,
-        1px 1px 0 #000;
+	color: $white;
+	font-size: 24px;
+	text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.5), -1px -1px 0 #000, 1px -1px 0 #000,
+		-1px 1px 0 #000, 1px 1px 0 #000;
 }
 
 :local(.inviteLinkAndCopyButton) {
-    margin-top: 2vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
+	margin-top: 2vh;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	cursor: pointer;
 }
 
 :local(.inviteLink) {
-    background-color: $white;
-    border-top-left-radius: 16px;
-    border-bottom-left-radius: 16px;
-    padding: 8px 8px 8px 24px;
-    width: 76vw;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	background-color: $white;
+	border-top-left-radius: 16px;
+	border-bottom-left-radius: 16px;
+	padding: 8px 8px 8px 24px;
+	width: 76vw;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 :local(.copyButton) {
-    width: 4vw;
-    background-color: $purple;
-    color: $white;
-    border-top-right-radius: 16px;
-    border-bottom-right-radius: 16px;
-    padding: 8px 16px;
+	width: 4vw;
+	background-color: $purple;
+	color: $white;
+	border-top-right-radius: 16px;
+	border-bottom-right-radius: 16px;
+	padding: 8px 16px;
 }
 
 :local(.midSection) {
-    margin-top: 4vh;
-    display: grid;
-    grid-template-columns: auto auto auto;
-    column-gap: 3vw;
-    height: 60vh;
+	margin-top: 4vh;
+	display: grid;
+	grid-template-columns: auto auto auto;
+	column-gap: 3vw;
+	height: 60vh;
 }
 
 :local(.settings) {
-    background-color: $green;
-    border-radius: 24px;
-    padding: 16px;
-    width: 19vw;
+	background-color: $green;
+	border-radius: 24px;
+	padding: 16px;
+	width: 19vw;
 }
 
 :local(.midText) {
-    color: $white;
-    font-size: 24px;
-    font-weight: bold;
+	color: $white;
+	font-size: 24px;
+	font-weight: bold;
 }
 
 :local(.setting) {
-    background-color: rgba($white, 0.5);
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    border-radius: 16px;
-    margin-top: 4vh;
+	background-color: rgba($white, 0.5);
+	padding: 8px;
+	display: flex;
+	flex-direction: column;
+	border-radius: 16px;
+	margin-top: 4vh;
 }
 
 :local(.settingText) {
-    font-size: 18px;
+	font-size: 18px;
 }
 
 :local(.slider) {
-    margin: 4vh 0 !important;
-    width: 80% !important;
-    align-self: center;
+	margin: 4vh 0 !important;
+	width: 80% !important;
+	align-self: center;
 }
 
 :local(.players) {
-    background-color: $orange;
-    border-radius: 24px;
-    padding: 16px;
-    width: 19vw;
+	background-color: $orange;
+	border-radius: 24px;
+	padding: 16px;
+	width: 19vw;
 }
 
 :local(.chatBox) {
-    width: 36vw;
+	width: 36vw;
 }
 
 :local(.startButton) {
-    margin-top: 32px !important;
-    background-color: $purple !important;
-    font-size: 28px !important;
-    width: calc(80vw + 64px);
-    border-radius: 12px !important;
-}
-
-:local(.userBox) {
-    border-radius: 50px;
-    padding: 12px 16px;
-    font-size: 18px;
-    display: flex;
-    justify-content: center;
-}
-
-:local(.user) {
-    color: $black;
-    background-color: rgba($white, 0.5);
-    
-}
-
-:local(.otherUser) {
-    color: $white;
-    background-color: rgba($black, 0.25);
-}
-
-:local(.userBoxs) {
-    margin-top: 3vh;
-    display: grid;
-    row-gap: 3vh;
+	margin-top: 32px !important;
+	background-color: $purple !important;
+	font-size: 28px !important;
+	width: calc(80vw + 64px);
+	border-radius: 12px !important;
 }

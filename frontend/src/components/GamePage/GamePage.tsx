@@ -3,8 +3,8 @@ import { RouteComponentProps } from 'react-router';
 import { withRouter } from 'react-router-dom';
 import { Canvas } from '../Canvas/Canvas';
 import { ChatBox, IMessage } from '../ChatBox/ChatBox';
-import { ColorCode } from '../util';
-import { RankBox } from '../RankBox/RankBox';
+import { PlayersBox } from '../PlayersBox/PlayersBox';
+import { ColorCode, IPlayer } from '../util';
 import { Toolbar } from '../Toolbar/Toolbar';
 import styles from './GamePage.module.scss';
 import consumer from '../cable';
@@ -15,12 +15,25 @@ interface RouteParams {
 
 interface IGamePage extends RouteComponentProps<RouteParams> {}
 
+const mockPlayers = [
+	{
+		name: 'test',
+		score: '300',
+	},
+	{
+		name: 'test2',
+		score: '100',
+	},
+];
+
 const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const room = props.match.params.room;
 	const username = sessionStorage.getItem('username') || '';
 	console.log(`Room ${room} UserName ${username}`);
 	const [messageChannel, setMessageChannel] = useState<any>();
 	const [messages, setMessages] = useState<IMessage[]>([]);
+	const [rankPlayers, setRankPlayers] = useState<IPlayer[]>([]);
+	const [round, setRound] = useState(1);
 
 	useEffect(() => {
 		setMessageChannel(
@@ -40,9 +53,18 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	}, [room, username]);
 
 	const handleReceived = (data: any) => {
-		console.log(data);
 		if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [...messages, data]);
+		} else if (data.type === 'get-rank-players') {
+			const usernames = data.usernames;
+			// assume that first member will be leader? not sure if this work
+			const newRankPlayers: IPlayer[] = usernames.map(
+				(username: string, score: string, idx: number) => ({
+					name: username,
+					score,
+				})
+			);
+			setRankPlayers(newRankPlayers);
 		}
 	};
 
@@ -56,12 +78,16 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	return (
 		<div className={styles.background}>
 			<div className={styles.header}>
-				<span>Round 1/10</span>
-				<span>Word</span>
-				<span>Time: 240</span>
+				<div className={styles.round}>Round {round}/10</div>
+				<div className={styles.word}>Word</div>
+				<div className={styles.time}>Time: 240</div>
 			</div>
 			<div className={styles.main}>
-				<RankBox />
+				<PlayersBox
+					title={'Ranking'}
+					players={mockPlayers}
+					username={username}
+				/>
 				<Canvas
 					color={color}
 					reset={reset}
