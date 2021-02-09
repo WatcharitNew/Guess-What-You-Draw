@@ -34,6 +34,8 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [messages, setMessages] = useState<IMessage[]>([]);
 	const [rankPlayers, setRankPlayers] = useState<IPlayer[]>([]);
 	const [round, setRound] = useState(1);
+	const [maxRound, setMaxRound] = useState<number>(5);
+    const [timePerTurn, setTimePerTurn] = useState<number>(30);
 
 	useEffect(() => {
 		setMessageChannel(
@@ -65,6 +67,10 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				})
 			);
 			setRankPlayers(newRankPlayers);
+		} else if (data.type === 'new-room-data') {
+			const { usernames, maxRound, timePerTurn } = data;
+			setMaxRound(maxRound);
+			setTimePerTurn(timePerTurn);
 		}
 	};
 
@@ -78,7 +84,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	return (
 		<div className={styles.background}>
 			<div className={styles.header}>
-				<div className={styles.round}>Round {round}/10</div>
+				<div className={styles.round}>Round {round}/{maxRound}</div>
 				<div className={styles.word}>Word</div>
 				<div className={styles.time}>Time: 240</div>
 			</div>
