@@ -1,0 +1,20 @@
+@import '../variable.scss';
+
+:local(.players) {
+	background-color: $orange;
+	border-radius: 24px;
+	padding: 16px;
+	width: 19vw;
+}
+
+:local(.playerBoxes) {
+	margin-top: 3vh;
+	display: grid;
+	row-gap: 3vh;
+}
+
+:local(.midText) {
+	color: $white;
+	font-size: 24px;
+	font-weight: bold;
+}
