@@ -5,6 +5,8 @@ import { Button, TextField } from '@material-ui/core';
 import { RouteComponentProps, useHistory } from 'react-router';
 import axios from 'axios'
 
+const ENDPOINT = process.env.REACT_APP_BACKEND || "http://localhost:10000";
+
 interface RouteParams {
 	room: string,
 }
@@ -14,19 +16,43 @@ interface IHomePage extends RouteComponentProps<RouteParams> {}
 export const HomePage: React.FC<IHomePage> = (props) => {
 	const room = props.match.params.room;
 	const history = useHistory();
-	const [username,SetUserName] = useState<string>('');
+	const [username, setUsername] = useState<string>('');
+	const [nameErrorText, setNameErrorText] = useState<string>('');
 
 	const onSubmit = () => {
 		sessionStorage.setItem("username", username);
-		if(room) {
-			history.push(`/room/${room}`);
-			history.go(0);
+		if(username.length <= 0) {
+			setNameErrorText('Please enter your name.');
+		}
+		else if(room) {
+			axios.post(`${ENDPOINT}/room/${room}`, {username: username})
+				.then((res) => {
+					console.log(res);
+					if(res.status === 200) {
+						history.push(`/room/${room}`);
+						history.go(0);
+					}
+					else if(res.status === 400 && res.data.error === "Duplicate username") {
+						setNameErrorText('The username is already used. Please use another username.');
+					}
+					else {
+						setNameErrorText('Maybe server down. Please try again later.');
+					}
+				})
+				.catch((error) => {
+					if(error.response.status === 400 && error.response.data.error === "Duplicate username")
+					{
+						setNameErrorText('The username is already used. Please use another username.');
+					}
+					else {
+						setNameErrorText('Maybe server down. Please try again later.');
+					}
+				})
 		}
 		else {
-			axios.post('http://localhost:10000/room')
+			axios.post(`${ENDPOINT}/room`)
 				.then(res => {
 					if(res.data.room) {
-						console.log(res.data.room)
 						history.push(`/room/${res.data.room}`);
 						history.go(0);
 					}
@@ -42,7 +68,7 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 	}
 
 	const handleChangeName = (newName: string) => {
-		SetUserName(newName);
+		setUsername(newName.trim());
 	}
 
 	return (
@@ -70,6 +96,7 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 			<Button className={styles.playButton} variant="contained" color="primary" onClick={onSubmit}>
 				{room? 'Join' : 'Create room'}
 			</Button>
+			<span className={styles.nameErrorText}>{nameErrorText}</span>
 		</div>
 	);
 };

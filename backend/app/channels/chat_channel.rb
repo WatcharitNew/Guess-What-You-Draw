@@ -16,6 +16,9 @@ class ChatChannel < ApplicationCable::Channel
     if roomData
       roomData = JSON.parse(roomData)
       usernames = roomData['usernames']
+      if usernames.include? username
+        return
+      end
       usernames.push(username)
     else
       usernames = [username]

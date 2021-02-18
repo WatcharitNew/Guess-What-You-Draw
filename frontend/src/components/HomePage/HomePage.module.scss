@@ -87,3 +87,7 @@
     width: fit-content;
     border-radius: 12px !important;
 }
+
+:local(.nameErrorText) {
+    color: red;
+}
