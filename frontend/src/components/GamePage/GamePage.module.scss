@@ -1,5 +1,10 @@
 @import '../variable.scss';
 
+:local(.gamePage) {
+	display: flex;
+	height: 100vh;
+}
+
 :local(.background) {
 	display: flex;
 	background-color: $yellow;

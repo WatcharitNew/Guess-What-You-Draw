@@ -22,6 +22,7 @@ export const PlayersBox: React.FC<IPlayersBox> = (props) => {
 						isLeader={player.isLeader}
 						score={player.score}
 						isUser={username === player.name}
+						rank={idx}
 					/>
 				))}
 			</div>
