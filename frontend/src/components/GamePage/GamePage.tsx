@@ -94,6 +94,10 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			setShowNewRound(true);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
+		} else if (data.type === 'get-room-data') {
+			const { maxRound, timePerTurn } = data;
+			setMaxRound(maxRound);
+			setTimePerTurn(timePerTurn);
 		}
 	};
 
@@ -110,10 +114,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				})
 			);
 			setRankPlayers(newRankPlayers);
-		} else if (data.type === 'new-room-data') {
-			const { usernames, maxRound, timePerTurn } = data;
-			setMaxRound(maxRound);
-			setTimePerTurn(timePerTurn);
 		}
 	};
 

@@ -5,6 +5,7 @@ class ChatChannel < ApplicationCable::Channel
   #     usernames: string[],
   #     maxRound: number,
   #     timePerTurn: number,
+  #     isStart: boolean,
   #   }
   # }
 
@@ -20,14 +21,20 @@ class ChatChannel < ApplicationCable::Channel
         return
       end
       usernames.push(username)
+      maxRound = roomData['maxRound']
+      timePerTurn = roomData['timePerTurn']
+      isStart = roomData['isStart']
     else
       usernames = [username]
+      maxRound = 5
+      timePerTurn = 30
+      isStart = false
     end
-    $redis.set(room, {usernames: usernames, maxRound: 5, timePerTurn: 30}.to_json)
+    $redis.set(room, {usernames: usernames, maxRound: maxRound, timePerTurn: timePerTurn, isStart: isStart}.to_json)
 
     stream_from "#{room}"
     ActionCable.server.broadcast "#{room}", {type: 'recieve-message', content: "#{username} joined"}
-    ActionCable.server.broadcast "#{room}", {type: 'new-room-data', usernames: usernames, maxRound: 5, timePerTurn: 30}
+    ActionCable.server.broadcast "#{room}", {type: 'new-room-data', usernames: usernames, maxRound: maxRound, timePerTurn: timePerTurn}
   end
 
   def receive(data)
@@ -71,6 +78,16 @@ class ChatChannel < ApplicationCable::Channel
           timePerTurn: roomData['timePerTurn']
         })
       end
+    elsif data['type'] == 'start-room'
+      roomData = $redis.get(room)
+      if roomData
+        roomData = JSON.parse(roomData)
+        roomData['isStart'] = true
+        $redis.set(room, roomData.to_json)
+        ActionCable.server.broadcast("#{room}", {
+          type: 'room-start'
+        })
+      end
     end
   end
 
@@ -82,6 +99,9 @@ class ChatChannel < ApplicationCable::Channel
     roomData = $redis.get(room)
     if roomData
       roomData = JSON.parse(roomData)
+      if roomData['isStart']==true
+        return
+      end
       roomData['usernames'].delete(username)
       usernames = roomData['usernames']
       if usernames.length == 0

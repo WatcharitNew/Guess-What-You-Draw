@@ -19,16 +19,19 @@ class GameChannel < ApplicationCable::Channel
       roomData = JSON.parse(roomData)
       puts "roomData #{roomData}"
       allUser = roomData['usernames']
+      maxRound = roomData['maxRound']
+      timePerTurn = roomData['timePerTurn']
     end
 
     @@rooms[room]['user'] += 1
 
-    puts "all user length #{allUser}"
+    puts "all user length #{allUser.length()}"
     puts "room all user #{@@rooms[room]['user']}"
      
     # @@rooms[room]['word'] = @@words[rand @@words.length()]
     if(@@rooms[room]['user'] == allUser.length())
       ActionCable.server.broadcast "game_#{room}", {type: 'game-start'}  
+      ActionCable.server.broadcast "game_#{room}", {type: 'get-room-data', usernames: allUser, maxRound: maxRound, timePerTurn: timePerTurn} 
     end
     
     # ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room]['word'], round: @@rooms[room]['round']}  

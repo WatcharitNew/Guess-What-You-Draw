@@ -33,9 +33,11 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 
 	const history = useHistory();
 	const handleStart = () => {
-        messageChannel.send({type:'get-room-data'});
-		history.push(`/game/${room}`);
-		history.go(0);
+        messageChannel.send({type:'start-room'});
+		setTimeout(() => {  
+			history.push(`/game/${room}`);
+			history.go(0); 
+		}, 10);
 	};
 
     const inviteLink = `${window.location.host}/home/${room}`;
@@ -110,6 +112,9 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
                 setMaxRound(maxRound);
                 setTimePerTurn(timePerTurn);
             }
+		} else if (data.type === 'room-start') {
+			history.push(`/game/${room}`);
+			history.go(0);
 		}
 	};
     
