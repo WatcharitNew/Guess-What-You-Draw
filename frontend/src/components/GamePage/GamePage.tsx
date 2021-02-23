@@ -7,7 +7,6 @@ import { PlayersBox } from '../PlayersBox/PlayersBox';
 import { ColorCode, IPlayer } from '../util';
 import { Toolbar } from '../Toolbar/Toolbar';
 import { Timer } from '../Timer/Timer';
-import { NewRoundModal } from '../NewRoundModal/NewRoundModal';
 
 import styles from './GamePage.module.scss';
 import consumer from '../cable';
@@ -32,8 +31,6 @@ const mockPlayers = [
 const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const room = props.match.params.room;
 	const username = sessionStorage.getItem('username') || '';
-	console.log(`Room ${room} UserName ${username}`);
-	const [messageChannel, setMessageChannel] = useState<any>();
 	const [gameChannel, setGameChannel] = useState<any>();
 	const [messages, setMessages] = useState<IMessage[]>([]);
 	const [rankPlayers, setRankPlayers] = useState<IPlayer[]>([]);
@@ -45,20 +42,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 
 	useEffect(() => {
-		setMessageChannel(
-			consumer.subscriptions.create(
-				{
-					channel: 'ChatChannel',
-					username,
-					room,
-				},
-				{
-					received: (data: IMessage) => handleReceived(data),
-					// connected: () => console.log('connected'),
-					// disconnected: () => console.log('disconnected'),
-				}
-			)
-		);
 		setGameChannel(
 			consumer.subscriptions.create(
 				{
@@ -73,12 +56,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				}
 			)
 		);
-
-		if (showNewRound) {
-			setTimeout(() => {
-				setShowNewRound(false);
-			}, 5000);
-		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [room, username, showNewRound]);
 
@@ -91,29 +68,14 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			setWord(data.content);
 			setRound(data.round);
 			setReset(true);
-			setShowNewRound(true);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
 		} else if (data.type === 'get-room-data') {
 			const { maxRound, timePerTurn } = data;
 			setMaxRound(maxRound);
 			setTimePerTurn(timePerTurn);
-		}
-	};
-
-	const handleReceived = (data: any) => {
-		if (data.type === 'recieve-message') {
+		} else if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [...messages, data]);
-		} else if (data.type === 'get-rank-players') {
-			const usernames = data.usernames;
-			// assume that first member will be leader? not sure if this work
-			const newRankPlayers: IPlayer[] = usernames.map(
-				(username: string, score: string, idx: number) => ({
-					name: username,
-					score,
-				})
-			);
-			setRankPlayers(newRankPlayers);
 		}
 	};
 
@@ -127,7 +89,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	};
 
 	const onSubmitChat = (chatMessage: string) => {
-		messageChannel.send({ type: 'send-message', content: chatMessage });
+		gameChannel.send({ type: 'send-message', content: chatMessage });
 	};
 
 	const [color, setColor] = useState<ColorCode>('#000000');
@@ -139,12 +101,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 
 	return (
 		<div>
-			<NewRoundModal
-				round={round}
-				maxRound={maxRound}
-				word={word}
-				show={showNewRound}
-			/>
 			<div className={styles.background}>
 				<div className={styles.header}>
 					<div className={styles.round}>
@@ -152,7 +108,13 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 					</div>
 					<div className={styles.word}>Word: {word}</div>
 					<div className={styles.time}>
-						Time: <Timer newTime={timePerTurn} onTimeOut={onTimeOut} />
+						Time: <Timer 
+								newTime={timePerTurn} 
+								onTimeOut={onTimeOut} 
+								round={round}
+								maxRound={maxRound}
+								word={word}
+							/>
 					</div>
 				</div>
 				<div className={styles.main}>

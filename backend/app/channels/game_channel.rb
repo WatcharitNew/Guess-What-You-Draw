@@ -48,6 +48,8 @@ class GameChannel < ApplicationCable::Channel
       @@rooms[room]['word'] = @@words[rand @@words.length()]
       @@rooms[room]['round'] += 1
       ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room]['word'], round: @@rooms[room]['round']}  
+    elsif data['type'] == 'send-message'
+      ActionCable.server.broadcast("game_#{room}", {type: 'recieve-message', sender: username, content: data['content']})
     end
   end
 

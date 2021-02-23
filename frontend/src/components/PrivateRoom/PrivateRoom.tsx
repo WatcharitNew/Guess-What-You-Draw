@@ -22,7 +22,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	const room = props.match.params.room;
 	const username = sessionStorage.getItem('username') || '';
 
-	const [messageChannel, setMessageChannel] = useState<any>();
+	const [roomChannel, setRoomChannel] = useState<any>();
 	const [messages, setMessages] = useState<IMessage[]>([]);
 	const [players, setPlayers] = useState<IPlayer[]>([]);
     const [maxRound, setMaxRound] = useState<number>(5);
@@ -33,7 +33,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 
 	const history = useHistory();
 	const handleStart = () => {
-        messageChannel.send({type:'start-room'});
+        roomChannel.send({type:'start-room'});
 		setTimeout(() => {  
 			history.push(`/game/${room}`);
 			history.go(0); 
@@ -76,10 +76,10 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	];
 
 	useEffect(() => {
-		setMessageChannel(
+		setRoomChannel(
 			consumer.subscriptions.create(
 				{
-					channel: 'ChatChannel',
+					channel: 'RoomChannel',
 					username,
 					room,
 				},
@@ -90,6 +90,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 				}
 			)
 		);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [room, username]);
 
 	const handleReceived = (data: any) => {
@@ -119,7 +120,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	};
     
     const onSubmitChat = (chatMessage: string) => {
-        messageChannel.send({type:'send-message', content: chatMessage});
+        roomChannel.send({type:'send-message', content: chatMessage});
     }
 
     const handleSlideRound = (_:any, value: number | number[]) => {
@@ -132,12 +133,12 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 
     const handleSlideRoundCommitted = (_:any, value: number | number[]) => {
         setMaxRound(value as number);
-        messageChannel.send({type:'set-round', maxRound: value});
+        roomChannel.send({type:'set-round', maxRound: value});
     }
 
     const handleSlideTimeCommitted = (_:any, value: number | number[]) => {
         setTimePerTurn(value as number);
-        messageChannel.send({type:'set-time', timePerTurn: value});
+        roomChannel.send({type:'set-time', timePerTurn: value});
     }
 
 	return (
