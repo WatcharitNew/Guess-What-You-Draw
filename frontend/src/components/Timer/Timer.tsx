@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { NewRoundModal } from '../NewRoundModal/NewRoundModal';
+import { useTimer } from 'react-timer-hook';
 
 interface ITimer {
-	newTime?: number;
+	time: number;
 	onTimeOut: () => void;
 	round: number;
 	maxRound: number;
@@ -10,39 +11,40 @@ interface ITimer {
 }
 
 export const Timer: React.FC<ITimer> = (props) => {
-	const { newTime, onTimeOut, round, maxRound, word } = props;
-	const [time, setTime] = useState<number>(0);
+	const { time, onTimeOut, round, maxRound, word } = props;
 	const [show, setShowNewRound] = useState<boolean>(true);
 
+	const expiryTimestamp = Date.now() + time*1000 + 7000;
+
+	const _onTimeOut = () => {
+		setShowNewRound(false);
+		const newTime = Date.now() + time*1000 + 4000;
+		restart(newTime)
+	}
+
+	const {
+		seconds,
+		restart
+	} = useTimer({ expiryTimestamp, onExpire: _onTimeOut });
+
 	useEffect(() => {
-		if (newTime === undefined) {
-			setTimeout(() => {
-				console.log('timeout: ', newTime);
-				newTime && setTime(newTime);
-			}, 4000);
+		// once at first render
+		if(seconds === time+7 && word === '') { 
+			onTimeOut();
 		}
-		if (time === 0) {
+		// once at 3 seconds after first render
+		if(seconds === time+4 && show) {
+			setShowNewRound(false);
+		}
+		// every end of round
+		if(seconds === 4 && !show) {
 			setShowNewRound(true);
 			onTimeOut();
-
-			setTimeout(() => {
-				console.log('timeout: ', newTime);
-				newTime && setTime(newTime);
-			}, 4000);
-			setTimeout(() => {
-				setShowNewRound(false);
-			}, 4500);
 		}
-
-		const intervalId = setInterval(() => {
-			time > 0 && setTime(time - 1);
-		}, 1000);
-		return () => clearInterval(intervalId);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [time, newTime]);
-
+	}, [onTimeOut, seconds, show, time, word]);
 	return <div>
-		{time}
+		hahaha
+		{seconds > 4 ? seconds-4 : seconds}
 		<NewRoundModal
 			round={round}
 			maxRound={maxRound}

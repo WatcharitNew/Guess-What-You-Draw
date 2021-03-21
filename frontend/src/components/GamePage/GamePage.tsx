@@ -96,6 +96,8 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [reset, setReset] = useState<boolean>(false);
 
 	if (!timePerTurn || isLoading) {
+		console.log(timePerTurn);
+		console.log(isLoading);
 		return <div>loading</div>;
 	}
 
@@ -109,7 +111,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 					<div className={styles.word}>Word: {word}</div>
 					<div className={styles.time}>
 						Time: <Timer 
-								newTime={timePerTurn} 
+								time={timePerTurn || 30 } 
 								onTimeOut={onTimeOut} 
 								round={round}
 								maxRound={maxRound}
