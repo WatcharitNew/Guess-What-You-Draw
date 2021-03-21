@@ -7,6 +7,7 @@ interface ICanvas {
 	color: ColorCode;
 	reset: boolean;
 	setReset: (reset: boolean) => void;
+	onSendImage: (test: any) => void;
 	className?: string;
 }
 
@@ -14,7 +15,7 @@ const WIDTH = 800;
 const HEIGHT = 520;
 
 export const Canvas: React.FC<ICanvas> = (props) => {
-	const { color, reset, setReset, className } = props;
+	const { color, reset, setReset, onSendImage, className } = props;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [canvas, setCanvas] = useState<HTMLCanvasElement>();
 	const [ctx, setCtx] = useState<CanvasRenderingContext2D>();
@@ -32,6 +33,11 @@ export const Canvas: React.FC<ICanvas> = (props) => {
 			ctx?.clearRect(0, 0, WIDTH, HEIGHT);
 			setReset(false);
 		}
+
+		const intervalId = setInterval(() => {
+			onSendImage(canvas?.toDataURL());
+		}, 1000);
+		return () => clearInterval(intervalId);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [canvas, reset]);
 
