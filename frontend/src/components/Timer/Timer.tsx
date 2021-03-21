@@ -43,7 +43,6 @@ export const Timer: React.FC<ITimer> = (props) => {
 		}
 	}, [onTimeOut, seconds, show, time, word]);
 	return <div>
-		hahaha
 		{seconds > 4 ? seconds-4 : seconds}
 		<NewRoundModal
 			round={round}
