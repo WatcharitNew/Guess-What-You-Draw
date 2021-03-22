@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NewRoundModal } from '../NewRoundModal/NewRoundModal';
+import { NewRoundModal } from '../NiceModal/NewRoundModal';
 import { useTimer } from 'react-timer-hook';
 
 interface ITimer {

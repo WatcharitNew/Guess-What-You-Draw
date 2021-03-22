@@ -6,6 +6,7 @@ import styles from './PrivateRoom.module.scss';
 import consumer from '../cable';
 import { IPlayer } from '../util';
 import { PlayersBox } from '../PlayersBox/PlayersBox';
+import { useTimer } from 'react-timer-hook';
 
 interface RouteParams {
 	room: string;
@@ -22,7 +23,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	const room = props.match.params.room;
 	const username = sessionStorage.getItem('username') || '';
 
-	const [roomChannel, setRoomChannel] = useState<any>();
+	const [roomChannel, setRoomChannel] = useState<any>(null);
 	const [messages, setMessages] = useState<IMessage[]>([]);
 	const [players, setPlayers] = useState<IPlayer[]>([]);
     const [maxRound, setMaxRound] = useState<number>(5);
@@ -76,25 +77,29 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	];
 
 	useEffect(() => {
-		setRoomChannel(
-			consumer.subscriptions.create(
-				{
-					channel: 'RoomChannel',
-					username,
-					room,
-				},
-				{
-					received: (data: IMessage) => handleReceived(data),
-					// connected: () => console.log('connected'),
-					// disconnected: () => console.log('disconnected'),
-				}
-			)
-		);
+		console.log('hey');
+		const tmp = consumer.subscriptions.create(
+			{
+				channel: 'RoomChannel',
+				username,
+				room,
+			},
+			{
+				received: (data: IMessage) => handleReceived(data),
+				connected: () => console.log('connected'),
+				disconnected: () => console.log('disconnected'),
+			}
+		)
+		console.log(tmp);
+		if(tmp) {
+			console.log('set');
+			setRoomChannel(tmp);
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [room, username]);
 
 	const handleReceived = (data: any) => {
-		// console.log(data);
+		console.log(data);
 		if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [
 				...messages,
@@ -140,6 +145,16 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
         setTimePerTurn(value as number);
         roomChannel.send({type:'set-time', timePerTurn: value});
     }
+
+	const expiryTimestamp = Date.now() + 3000;
+	const onGetNewData = () => {
+		console.log('get new data');
+		console.log(roomChannel);
+		if(roomChannel) {
+			roomChannel.send({type:'get-new-data'})
+		} 
+	}
+	useTimer({ expiryTimestamp, onExpire: onGetNewData });
 
 	return (
 		<div className={styles.background}>

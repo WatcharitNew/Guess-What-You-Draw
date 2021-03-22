@@ -10,6 +10,7 @@ import { Timer } from '../Timer/Timer';
 
 import styles from './GamePage.module.scss';
 import consumer from '../cable';
+import { EndGameModal } from '../NiceModal/EndGameModal';
 
 interface RouteParams {
 	room: string;
@@ -40,6 +41,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [word, setWord] = useState<string>('');
 	const [showNewRound, setShowNewRound] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [showEndGameModal, setShowEndGameModal] = useState<boolean>(false);
 
 	useEffect(() => {
 		setGameChannel(
@@ -60,6 +62,9 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	}, [room, username, showNewRound]);
 
 	const handleGameChannelReceived = (data: any) => {
+		if(showEndGameModal) {
+			return
+		}
 		if (data.type === 'game-start') {
 			console.log('game start');
 			setIsLoading(false);
@@ -80,7 +85,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	};
 
 	const onSendImage = (img: any) => {
-		gameChannel.send({ type: 'send-image', content: img });
+		// gameChannel.send({ type: 'send-image', content: img });
 	};
 
 	const onTimeOut = () => {
@@ -100,6 +105,12 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		console.log(isLoading);
 		return <div>loading</div>;
 	}
+
+	if(round > maxRound && !showEndGameModal) {
+		setShowEndGameModal(true);
+	}
+
+	const mockPlayers2 = [['player1', 100], ['player2', 200]]
 
 	return (
 		<div>
@@ -150,6 +161,11 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				>
 					test
 				</button>
+				<EndGameModal
+					show={showEndGameModal}
+					players={mockPlayers2}
+					room={room}
+				/>
 			</div>
 		</div>
 	);
