@@ -76,25 +76,19 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	];
 
 	useEffect(() => {
-		if (!roomChannel) {
-			const tmp = consumer.subscriptions.create(
-				{
-					channel: 'RoomChannel',
-					username,
-					room,
-				},
-				{
-					received: (data: IMessage) => handleReceived(data),
-					connected: () => console.log('connected'),
-					disconnected: () => console.log('disconnected'),
-				}
-			);
-
-			setRoomChannel(tmp);
-		}
-		console.log('room: ', roomChannel);
-		console.log('username: ', username);
-		console.log('room: ', room);
+		setRoomChannel(
+			consumer.subscriptions.create(
+			{
+				channel: 'RoomChannel',
+				username,
+				room,
+			},
+			{
+				received: (data: IMessage) => handleReceived(data),
+				connected: () => console.log('connected'),
+				disconnected: () => console.log('disconnected'),
+			}
+		));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [roomChannel]);
 	// }, [room, username, roomChannel]);
@@ -146,15 +140,6 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 		setTimePerTurn(value as number);
 		roomChannel.send({ type: 'set-time', timePerTurn: value });
 	};
-
-	const expiryTimestamp = Date.now() + 3000;
-	const onGetNewData = () => {
-		console.log('room channel: ', roomChannel);
-		if (roomChannel) {
-			roomChannel.send({ type: 'get-new-data' });
-		}
-	};
-	useTimer({ expiryTimestamp, onExpire: roomChannel && onGetNewData });
 
 	return (
 		<div className={styles.background}>
