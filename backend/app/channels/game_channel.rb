@@ -1,53 +1,69 @@
 class GameChannel < ApplicationCable::Channel
-  @@rooms = Hash.new({"user" => 0, "word" => '', "round" => 0})
-  @@words = ['cat', 'dog', 'goat']
+  @@rooms = Hash.new()
+  @@words = %w[cat dog goat]
 
   def subscribed
     room = params[:room]
     username = params[:username]
 
-    numberAllUserLength = 0
-
-    stream_from "game_#{room}"
-    stream_from "game_#{room}_#{username}"
-    ActionCable.server.broadcast "game_#{room}", {type: 'connected', content: "#{room} #{username} connected"}
-
-    roomData = $redis.get(room)
-    puts "roomData #{roomData}"
-    allUser = []
-    if roomData
-      roomData = JSON.parse(roomData)
-      puts "roomData #{roomData}"
-      allUser = roomData['usernames']
-      maxRound = roomData['maxRound']
-      timePerTurn = roomData['timePerTurn']
-    end
-
-    @@rooms[room]['user'] += 1
-
-    puts "all user length #{allUser.length()}"
-    puts "room all user #{@@rooms[room]['user']}"
-     
-    # @@rooms[room]['word'] = @@words[rand @@words.length()]
-    if(@@rooms[room]['user'] == allUser.length())
-      ActionCable.server.broadcast "game_#{room}", {type: 'game-start'}  
-      ActionCable.server.broadcast "game_#{room}", {type: 'get-room-data', usernames: allUser, maxRound: maxRound, timePerTurn: timePerTurn} 
+    
+    room_data = $redis.get(room)
+    puts "room_data #{room_data}"
+    
+    if room_data
+      room_json =  JSON.parse(room_data) || {}
+      @@rooms[room] ||= { 
+        :active_users => Array.new, 
+        :max_round => room_json['maxRound'], 
+        :time_per_turn => room_json['timePerTurn'], 
+        :all_users => room_json['usernames'].sort 
+      }
     end
     
-    # ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room]['word'], round: @@rooms[room]['round']}  
+    puts "actual in room #{@@rooms[room]}"
+    
+    if !@@rooms[room][:active_users].include?(username)
+      @@rooms[room][:active_users] << username
+      puts "user came in #{username}"
 
+      stream_from "game_#{room}"
+      stream_from "game_#{room}_#{username}"
+      ActionCable.server.broadcast "game_#{room}", {type: 'connected', content: "#{room} #{username} connected"}
+    else 
+      puts "same #{username}"
+    end
+
+    puts "room all user #{@@rooms[room][:active_users]}"
+     
+    if @@rooms[room][:active_users].sort == @@rooms[room][:all_users]
+      @@rooms[room][:round] = 1
+      random_word(room)
+
+      ActionCable.server.broadcast "game_#{room}", { 
+        type: 'game-start', 
+        usernames: @@rooms[room][:all_users], 
+        maxRound: @@rooms[room][:max_round], 
+        timePerTurn: @@rooms[room][:time_per_turn],
+        word: @@rooms[room][:word],
+        round: @@rooms[room][:round]
+      }
+    end
   end
 
   def receive(data)
     room = params[:room]
     username = params[:username]
-    if data['type'] == 'send-image'
-      # do something predict and c
-      ActionCable.server.broadcast "game_#{room}_#{username}", {type: 'receive-result', content: "true"}
-    elsif data['type'] == 'end-round'
-      @@rooms[room]['word'] = @@words[rand @@words.length()]
-      @@rooms[room]['round'] += 1
-      ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room]['word'], round: @@rooms[room]['round']}  
+    if data['type'] == 'end-round'
+      @@rooms[room][:number_user_end_round] ||= 0;
+      @@rooms[room][:number_user_end_round] += 1
+      
+      if(@@rooms[room][:active_users].size() == @@rooms[room][:number_user_end_round])
+        @@rooms[room][:word] = @@words[rand @@words.size()]
+        @@rooms[room][:round] += 1
+        @@rooms[room][:number_user_end_round] = 0;
+        ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room][:word], round: @@rooms[room][:round]}  
+      end
+      
     elsif data['type'] == 'send-message'
       ActionCable.server.broadcast("game_#{room}", {type: 'recieve-message', sender: username, content: data['content']})
     end
@@ -56,10 +72,18 @@ class GameChannel < ApplicationCable::Channel
   def unsubscribed
     # Any cleanup needed when channel is unsubscribed
     room = params[:room]
-    @@rooms[room]['user'] -= 1
-    if @@rooms[room]['user'] == 0
-      @@rooms[room]['round'] = 0
-      @@rooms[room]['word'] = ''
+    username = params[:username]
+    puts "param room #{room}"
+    puts "room detail #{@@rooms[room]}"
+    
+    if @@rooms[room][:active_users].delete(username)
+      
     end
+  end
+
+  private
+
+  def random_word(room)
+    @@rooms[room][:word] = @@words[rand @@words.length()]
   end
 end

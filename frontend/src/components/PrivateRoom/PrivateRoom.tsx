@@ -26,27 +26,26 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	const [roomChannel, setRoomChannel] = useState<any>(null);
 	const [messages, setMessages] = useState<IMessage[]>([]);
 	const [players, setPlayers] = useState<IPlayer[]>([]);
-    const [maxRound, setMaxRound] = useState<number>(5);
-    const [timePerTurn, setTimePerTurn] = useState<number>(30);
+	const [maxRound, setMaxRound] = useState<number>(5);
+	const [timePerTurn, setTimePerTurn] = useState<number>(30);
 
-    const isLeader = username === players[0]?.name;
-
+	const isLeader = username === players[0]?.name;
 
 	const history = useHistory();
 	const handleStart = () => {
-        roomChannel.send({type:'start-room'});
-		setTimeout(() => {  
-			history.push(`/game/${room}`);
-			history.go(0); 
-		}, 10);
+		roomChannel.send({ type: 'start-room' });
+		// setTimeout(() => {
+		history.push(`/game/${room}`);
+		history.go(0);
+		// }, 10);
 	};
 
-    const inviteLink = `${window.location.host}/home/${room}`;
-    const copyToClipboard = () => {
-        navigator.clipboard.writeText(inviteLink);
-    };
+	const inviteLink = `${window.location.host}/home/${room}`;
+	const copyToClipboard = () => {
+		navigator.clipboard.writeText(inviteLink);
+	};
 
-    const roundsSliderMarks: sliderMark[] = [
+	const roundsSliderMarks: sliderMark[] = [
 		{
 			value: 1,
 			label: '1',
@@ -77,26 +76,28 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	];
 
 	useEffect(() => {
-		console.log('hey');
-		const tmp = consumer.subscriptions.create(
-			{
-				channel: 'RoomChannel',
-				username,
-				room,
-			},
-			{
-				received: (data: IMessage) => handleReceived(data),
-				connected: () => console.log('connected'),
-				disconnected: () => console.log('disconnected'),
-			}
-		)
-		console.log(tmp);
-		if(tmp) {
-			console.log('set');
+		if (!roomChannel) {
+			const tmp = consumer.subscriptions.create(
+				{
+					channel: 'RoomChannel',
+					username,
+					room,
+				},
+				{
+					received: (data: IMessage) => handleReceived(data),
+					connected: () => console.log('connected'),
+					disconnected: () => console.log('disconnected'),
+				}
+			);
+
 			setRoomChannel(tmp);
 		}
+		console.log('room: ', roomChannel);
+		console.log('username: ', username);
+		console.log('room: ', room);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [room, username]);
+	}, [roomChannel]);
+	// }, [room, username, roomChannel]);
 
 	const handleReceived = (data: any) => {
 		console.log(data);
@@ -114,47 +115,46 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 				})
 			);
 			setPlayers(newPlayers);
-            if(!isLeader) {
-                setMaxRound(maxRound);
-                setTimePerTurn(timePerTurn);
-            }
+			if (!isLeader) {
+				setMaxRound(maxRound);
+				setTimePerTurn(timePerTurn);
+			}
 		} else if (data.type === 'room-start') {
 			history.push(`/game/${room}`);
 			history.go(0);
 		}
 	};
-    
-    const onSubmitChat = (chatMessage: string) => {
-        roomChannel.send({type:'send-message', content: chatMessage});
-    }
 
-    const handleSlideRound = (_:any, value: number | number[]) => {
-        setMaxRound(value as number);
-    }
+	const onSubmitChat = (chatMessage: string) => {
+		roomChannel.send({ type: 'send-message', content: chatMessage });
+	};
 
-    const handleSlideTime = (_:any, value: number | number[]) => {
-        setTimePerTurn(value as number);
-    }
+	const handleSlideRound = (_: any, value: number | number[]) => {
+		setMaxRound(value as number);
+	};
 
-    const handleSlideRoundCommitted = (_:any, value: number | number[]) => {
-        setMaxRound(value as number);
-        roomChannel.send({type:'set-round', maxRound: value});
-    }
+	const handleSlideTime = (_: any, value: number | number[]) => {
+		setTimePerTurn(value as number);
+	};
 
-    const handleSlideTimeCommitted = (_:any, value: number | number[]) => {
-        setTimePerTurn(value as number);
-        roomChannel.send({type:'set-time', timePerTurn: value});
-    }
+	const handleSlideRoundCommitted = (_: any, value: number | number[]) => {
+		setMaxRound(value as number);
+		roomChannel.send({ type: 'set-round', maxRound: value });
+	};
+
+	const handleSlideTimeCommitted = (_: any, value: number | number[]) => {
+		setTimePerTurn(value as number);
+		roomChannel.send({ type: 'set-time', timePerTurn: value });
+	};
 
 	const expiryTimestamp = Date.now() + 3000;
 	const onGetNewData = () => {
-		console.log('get new data');
-		console.log(roomChannel);
-		if(roomChannel) {
-			roomChannel.send({type:'get-new-data'})
-		} 
-	}
-	useTimer({ expiryTimestamp, onExpire: onGetNewData });
+		console.log('room channel: ', roomChannel);
+		if (roomChannel) {
+			roomChannel.send({ type: 'get-new-data' });
+		}
+	};
+	useTimer({ expiryTimestamp, onExpire: roomChannel && onGetNewData });
 
 	return (
 		<div className={styles.background}>
@@ -179,10 +179,10 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 							min={1}
 							max={10}
 							marks={roundsSliderMarks}
-                            disabled={!isLeader}
-                            value={maxRound}
-                            onChange={handleSlideRound}
-                            onChangeCommitted={handleSlideRoundCommitted}
+							disabled={!isLeader}
+							value={maxRound}
+							onChange={handleSlideRound}
+							onChangeCommitted={handleSlideRoundCommitted}
 						/>
 					</div>
 					<div className={styles.setting}>
@@ -194,10 +194,10 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 							min={10}
 							max={60}
 							marks={drawTimeSliderMarks}
-                            disabled={!isLeader}
-                            value={timePerTurn}
-                            onChange={handleSlideTime}
-                            onChangeCommitted={handleSlideTimeCommitted}
+							disabled={!isLeader}
+							value={timePerTurn}
+							onChange={handleSlideTime}
+							onChangeCommitted={handleSlideTimeCommitted}
 						/>
 					</div>
 				</div>
@@ -214,7 +214,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 				onClick={handleStart}
 				variant='contained'
 				color='primary'
-                disabled={!isLeader}
+				disabled={!isLeader}
 			>
 				Start game
 			</Button>

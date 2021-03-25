@@ -14,41 +14,49 @@ export const Timer: React.FC<ITimer> = (props) => {
 	const { time, onTimeOut, round, maxRound, word } = props;
 	const [show, setShowNewRound] = useState<boolean>(true);
 
-	const expiryTimestamp = Date.now() + time*1000 + 7000;
+	const expiryTimestamp = Date.now() + time * 1000 + 7000;
 
 	const _onTimeOut = () => {
 		setShowNewRound(false);
-		const newTime = Date.now() + time*1000 + 4000;
-		restart(newTime)
-	}
+		const newTime = Date.now() + time * 1000 + 4000;
+		restart(newTime);
+	};
 
-	const {
-		seconds,
-		restart
-	} = useTimer({ expiryTimestamp, onExpire: _onTimeOut });
+	const { seconds, restart, pause } = useTimer({
+		expiryTimestamp,
+		onExpire: _onTimeOut,
+	});
 
 	useEffect(() => {
-		// once at first render
-		if(seconds === time+7 && word === '') { 
-			onTimeOut();
+		if (round > maxRound) {
+			restart(Date.now());
+			pause();
+			return;
 		}
+		// // once at first render
+		// if (seconds === time + 7 && word === '') {
+		// 	onTimeOut();
+		// }
 		// once at 3 seconds after first render
-		if(seconds === time+4 && show) {
+		if (seconds === time + 4 && show) {
 			setShowNewRound(false);
 		}
 		// every end of round
-		if(seconds === 4 && !show) {
+		if (seconds === 4 && !show) {
 			setShowNewRound(true);
 			onTimeOut();
 		}
-	}, [onTimeOut, seconds, show, time, word]);
-	return <div>
-		{seconds > 4 ? seconds-4 : seconds}
-		<NewRoundModal
-			round={round}
-			maxRound={maxRound}
-			word={word}
-			show={show}
-		/>
-		</div>;
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [onTimeOut, seconds, show, time]);
+	return (
+		<div>
+			{seconds > 4 ? seconds - 4 : seconds}
+			<NewRoundModal
+				round={round}
+				maxRound={maxRound}
+				word={word}
+				show={show}
+			/>
+		</div>
+	);
 };

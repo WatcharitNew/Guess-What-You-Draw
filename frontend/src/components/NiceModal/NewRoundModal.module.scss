@@ -18,3 +18,14 @@
 	animation: fade 1s linear;
 	opacity: 0;
 }
+
+@keyframes fade {
+	0%,
+	100% {
+		opacity: 0;
+	}
+	25%,
+	75% {
+		opacity: 1;
+	}
+}
