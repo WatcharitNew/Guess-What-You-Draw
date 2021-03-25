@@ -118,11 +118,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		setShowEndGameModal(true);
 	}
 
-	const mockPlayers2 = [
-		['player1', 100],
-		['player2', 200],
-	];
-
 	return (
 		<div>
 			<div className={styles.background}>
@@ -167,8 +162,9 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				</div>
 				<EndGameModal
 					show={showEndGameModal}
-					players={mockPlayers2}
 					room={room}
+					username={username}
+					players={mockPlayers}
 				/>
 			</div>
 		</div>

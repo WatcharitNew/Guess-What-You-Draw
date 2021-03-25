@@ -6,7 +6,6 @@ import styles from './PrivateRoom.module.scss';
 import consumer from '../cable';
 import { IPlayer } from '../util';
 import { PlayersBox } from '../PlayersBox/PlayersBox';
-import { useTimer } from 'react-timer-hook';
 
 interface RouteParams {
 	room: string;
@@ -85,13 +84,12 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 			},
 			{
 				received: (data: IMessage) => handleReceived(data),
-				connected: () => console.log('connected'),
-				disconnected: () => console.log('disconnected'),
+				// connected: () => console.log('connected'),
+				// disconnected: () => console.log('disconnected'),
 			}
 		));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [roomChannel]);
-	// }, [room, username, roomChannel]);
+	}, [room, username]);
 
 	const handleReceived = (data: any) => {
 		console.log(data);
