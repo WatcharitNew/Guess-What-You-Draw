@@ -10,6 +10,7 @@ import { Timer } from '../Timer/Timer';
 
 import styles from './GamePage.module.scss';
 import consumer from '../cable';
+import { EndGameModal } from '../NiceModal/EndGameModal';
 
 interface RouteParams {
 	room: string;
@@ -40,28 +41,46 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [word, setWord] = useState<string>('');
 	const [showNewRound, setShowNewRound] = useState<boolean>(true);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const [showEndGameModal, setShowEndGameModal] = useState<boolean>(false);
 
 	useEffect(() => {
-		setGameChannel(
-			consumer.subscriptions.create(
-				{
-					channel: 'GameChannel',
-					username,
-					room,
-				},
-				{
-					received: (data: IMessage) => handleGameChannelReceived(data),
-					// connected: () => console.log('connected'),
-					// disconnected: () => console.log('disconnected'),
-				}
-			)
+		console.log('a');
+		const channel = consumer.subscriptions.create(
+			{
+				channel: 'GameChannel',
+				username,
+				room,
+			},
+			{
+				received: (data: IMessage) => handleGameChannelReceived(data),
+			}
 		);
+
+		setGameChannel(channel);
+
+		return () => {
+			gameChannel.subscriptions.remove({
+				channel: 'GameChannel',
+				username,
+				room,
+			});
+			setGameChannel(null);
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [room, username, showNewRound]);
+	}, []);
+	// }, [room, username, showNewRound, gameChannel]);
 
 	const handleGameChannelReceived = (data: any) => {
+		if (showEndGameModal) {
+			return;
+		}
 		if (data.type === 'game-start') {
 			console.log('game start');
+			const { maxRound, timePerTurn, word, round } = data;
+			setMaxRound(maxRound);
+			setTimePerTurn(timePerTurn);
+			setWord(word);
+			setRound(round);
 			setIsLoading(false);
 		} else if (data.type === 'random-word') {
 			console.log(data);
@@ -70,17 +89,13 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			setReset(true);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
-		} else if (data.type === 'get-room-data') {
-			const { maxRound, timePerTurn } = data;
-			setMaxRound(maxRound);
-			setTimePerTurn(timePerTurn);
 		} else if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [...messages, data]);
 		}
 	};
 
 	const onSendImage = (img: any) => {
-		gameChannel.send({ type: 'send-image', content: img });
+		// gameChannel.send({ type: 'send-image', content: img });
 	};
 
 	const onTimeOut = () => {
@@ -95,11 +110,18 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [color, setColor] = useState<ColorCode>('#000000');
 	const [reset, setReset] = useState<boolean>(false);
 
-	if (!timePerTurn || isLoading) {
-		console.log(timePerTurn);
-		console.log(isLoading);
+	if (isLoading) {
 		return <div>loading</div>;
 	}
+
+	if (round > maxRound && !showEndGameModal) {
+		setShowEndGameModal(true);
+	}
+
+	const mockPlayers2 = [
+		['player1', 100],
+		['player2', 200],
+	];
 
 	return (
 		<div>
@@ -110,13 +132,14 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 					</div>
 					<div className={styles.word}>Word: {word}</div>
 					<div className={styles.time}>
-						Time: <Timer 
-								time={timePerTurn || 30 } 
-								onTimeOut={onTimeOut} 
-								round={round}
-								maxRound={maxRound}
-								word={word}
-							/>
+						Time:{' '}
+						<Timer
+							time={timePerTurn || 30}
+							onTimeOut={onTimeOut}
+							round={round}
+							maxRound={maxRound}
+							word={word}
+						/>
 					</div>
 				</div>
 				<div className={styles.main}>
@@ -142,14 +165,11 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				<div className={styles.bottom}>
 					<Toolbar setColor={setColor} setReset={setReset} />
 				</div>
-				<button
-					onClick={() => {
-						console.log('click');
-						setShowNewRound(!showNewRound);
-					}}
-				>
-					test
-				</button>
+				<EndGameModal
+					show={showEndGameModal}
+					players={mockPlayers2}
+					room={room}
+				/>
 			</div>
 		</div>
 	);
