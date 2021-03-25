@@ -1,48 +1,33 @@
 @import '../variable.scss';
 
 :local(.background) {
-	position: absolute;
-	width: 100vw;
-	height: 100vh;
-	left: 0;
-	top: 0;
-	background-color: $grey;
-	display: flex;
-	justify-content: center;
+	background: $green;
+    width: 50vw;
+    height: 60vh;
+    padding: 40px 16px;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
 	align-items: center;
-	flex-direction: column;
 }
 
-@keyframes fade {
-	0%,
-	100% {
-		opacity: 0;
-	}
-	25%,
-	75% {
-		opacity: 1;
-	}
-}
-
-:local(.notShow) {
-	display: none;
-}
-
-:local(.endRoundLabel),
-:local(.nextRoundLabel),
-:local(.wordLabel) {
-	font-size: 32px;
+:local(.label) {
+	font-size: 36px;
+    font-weight: bold;
 	color: $white;
+	text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.5);
 }
 
-:local(.endRoundLabel) {
-	position: absolute;
-	animation: fade 1s linear;
-	opacity: 0;
+:local(.players) {
+	width: 60%;
+    height: 100%;
+	margin-top: 8vh;
+	position: relative;
+	text-align: center;
 }
 
-:local(.newRound) {
-	animation: fade 3s linear;
-	animation-delay: 1s;
-	opacity: 0;
+:local(.backToRoomButton) {
+	background-color: $orange !important;
+	font-size: 18px !important;
+	border-radius: 12px !important;
 }

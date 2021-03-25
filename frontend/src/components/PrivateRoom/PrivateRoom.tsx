@@ -90,7 +90,6 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [roomChannel]);
-	// }, [room, username, roomChannel]);
 
 	const handleReceived = (data: any) => {
 		console.log(data);
