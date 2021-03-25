@@ -75,9 +75,15 @@ class GameChannel < ApplicationCable::Channel
     username = params[:username]
     puts "param room #{room}"
     puts "room detail #{@@rooms[room]}"
-    
-    if @@rooms[room][:active_users].delete(username)
-      
+
+    if @@rooms[room][:active_users].size == @@rooms[room][:all_users].size
+      $redis.del(room)
+    end
+
+    @@rooms[room][:active_users].delete(username)
+
+    if @@rooms[room][:active_users].empty?
+      @@rooms[room] = nil
     end
   end
 
