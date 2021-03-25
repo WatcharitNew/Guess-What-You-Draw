@@ -32,8 +32,6 @@ class RoomChannel < ApplicationCable::Channel
     end
     $redis.set(room, {usernames: usernames, maxRound: maxRound, timePerTurn: timePerTurn, isStart: isStart}.to_json)
 
-    puts room
-    puts username
     stream_from "room_#{room}"
     ActionCable.server.broadcast "room_#{room}", {type: 'recieve-message', content: "#{username} joined"}
     ActionCable.server.broadcast "room_#{room}", {type: 'new-room-data', usernames: usernames, maxRound: maxRound, timePerTurn: timePerTurn}
