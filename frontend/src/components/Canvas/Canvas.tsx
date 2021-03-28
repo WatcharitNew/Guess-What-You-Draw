@@ -7,15 +7,23 @@ interface ICanvas {
 	color: ColorCode;
 	reset: boolean;
 	setReset: (reset: boolean) => void;
-	onSendImage: (test: any) => void;
+	onPredictImage: (image: any) => void;
 	className?: string;
+	getImageData: boolean;
 }
 
 const WIDTH = 800;
 const HEIGHT = 520;
 
 export const Canvas: React.FC<ICanvas> = (props) => {
-	const { color, reset, setReset, onSendImage, className } = props;
+	const {
+		color,
+		reset,
+		setReset,
+		className,
+		getImageData,
+		onPredictImage,
+	} = props;
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const [canvas, setCanvas] = useState<HTMLCanvasElement>();
 	const [ctx, setCtx] = useState<CanvasRenderingContext2D>();
@@ -34,12 +42,11 @@ export const Canvas: React.FC<ICanvas> = (props) => {
 			setReset(false);
 		}
 
-		const intervalId = setInterval(() => {
-			onSendImage(canvas?.toDataURL());
-		}, 1000);
-		return () => clearInterval(intervalId);
+		if (getImageData) {
+			onPredictImage(canvas?.toDataURL());
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [canvas, reset]);
+	}, [canvas, reset, getImageData]);
 
 	const startDrawing = (e: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
 		if (ctx && canvas) {

@@ -11,6 +11,7 @@ import { Timer } from '../Timer/Timer';
 import styles from './GamePage.module.scss';
 import consumer from '../cable';
 import { EndGameModal } from '../NiceModal/EndGameModal';
+import { CorrectPredictionModal } from '../NiceModal/CorrectPredictionModal';
 
 interface RouteParams {
 	room: string;
@@ -18,30 +19,22 @@ interface RouteParams {
 
 interface IGamePage extends RouteComponentProps<RouteParams> {}
 
-const mockPlayers = [
-	{
-		name: 'test',
-		score: '300',
-	},
-	{
-		name: 'test2',
-		score: '100',
-	},
-];
-
 const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const room = props.match.params.room;
 	const username = sessionStorage.getItem('username') || '';
 	const [gameChannel, setGameChannel] = useState<any>();
 	const [messages, setMessages] = useState<IMessage[]>([]);
+	const [score, setScore] = useState<number>(0);
 	const [rankPlayers, setRankPlayers] = useState<IPlayer[]>([]);
 	const [round, setRound] = useState(1);
 	const [maxRound, setMaxRound] = useState<number>(5);
-	const [timePerTurn, setTimePerTurn] = useState<number | undefined>(undefined);
+	const [timePerTurn, setTimePerTurn] = useState<number>(0);
 	const [word, setWord] = useState<string>('');
-	const [showNewRound, setShowNewRound] = useState<boolean>(true);
+	const [showCorrectModal, setShowCorrectModal] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [showEndGameModal, setShowEndGameModal] = useState<boolean>(false);
+	const [getImageData, setGetImageData] = useState<boolean>(false);
+	const [seconds, setSeconds] = useState<number>(0);
 
 	useEffect(() => {
 		console.log('a');
@@ -76,17 +69,35 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		}
 		if (data.type === 'game-start') {
 			console.log('game start');
-			const { maxRound, timePerTurn, word, round } = data;
+			const { maxRound, timePerTurn, word, round, rank } = data;
+			console.log('rank: ', typeof rank);
 			setMaxRound(maxRound);
 			setTimePerTurn(timePerTurn);
 			setWord(word);
 			setRound(round);
+			const newRankPlayers: IPlayer[] = [];
+			Object.entries(rank).forEach(([key, value]) => {
+				newRankPlayers.push({
+					name: key,
+					score: typeof value === 'number' ? value.toString() : '0',
+				});
+			});
 			setIsLoading(false);
+			setRankPlayers(newRankPlayers);
 		} else if (data.type === 'random-word') {
+			const { content, round, rank } = data;
 			console.log(data);
-			setWord(data.content);
-			setRound(data.round);
+			setWord(content);
+			setRound(round);
 			setReset(true);
+			const newRankPlayers: IPlayer[] = [];
+			Object.entries(rank).forEach(([key, value]) => {
+				newRankPlayers.push({
+					name: key,
+					score: typeof value === 'number' ? value.toString() : '0',
+				});
+			});
+			setRankPlayers(newRankPlayers);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
 		} else if (data.type === 'recieve-message') {
@@ -94,13 +105,35 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		}
 	};
 
-	const onSendImage = (img: any) => {
-		// gameChannel.send({ type: 'send-image', content: img });
+	const onPredictImageTime = (seconds: number) => {
+		setSeconds(seconds);
+		setGetImageData(true);
+	};
+
+	// Todo: change to real model, Now: Mock model
+	const onPredictImage = (image: any) => {
+		setGetImageData(false);
+		const words = ['cat', 'dog', 'goat'];
+		const predictedWord = words[Math.floor(Math.random() * words.length)];
+		const predictedWord1 = words[Math.floor(Math.random() * words.length)];
+		const predictedWord2 = words[Math.floor(Math.random() * words.length)];
+
+		if (
+			!showCorrectModal &&
+			predictedWord === word &&
+			predictedWord1 === predictedWord2 &&
+			predictedWord === predictedWord1
+		) {
+			setScore(10 * seconds);
+			setShowCorrectModal(true);
+		}
 	};
 
 	const onTimeOut = () => {
 		console.log('timeout');
-		gameChannel.send({ type: 'end-round' });
+		setShowCorrectModal(false);
+		gameChannel.send({ type: 'end-round', score });
+		setScore(0);
 	};
 
 	const onSubmitChat = (chatMessage: string) => {
@@ -134,21 +167,24 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 							round={round}
 							maxRound={maxRound}
 							word={word}
+							onPredictImageTime={onPredictImageTime}
+							showCorrect={showCorrectModal}
 						/>
 					</div>
 				</div>
 				<div className={styles.main}>
 					<PlayersBox
 						title={'Ranking'}
-						players={mockPlayers}
+						players={rankPlayers}
 						username={username}
 					/>
 					<Canvas
 						color={color}
 						reset={reset}
 						setReset={setReset}
-						onSendImage={onSendImage}
+						onPredictImage={onPredictImage}
 						className={styles.canvas}
+						getImageData={getImageData}
 					/>
 					<ChatBox
 						className={styles.chatBox}
@@ -160,11 +196,12 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				<div className={styles.bottom}>
 					<Toolbar setColor={setColor} setReset={setReset} />
 				</div>
+				<CorrectPredictionModal show={showCorrectModal} />
 				<EndGameModal
 					show={showEndGameModal}
 					room={room}
 					username={username}
-					players={mockPlayers}
+					players={rankPlayers}
 				/>
 			</div>
 		</div>

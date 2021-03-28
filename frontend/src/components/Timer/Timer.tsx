@@ -8,10 +8,20 @@ interface ITimer {
 	round: number;
 	maxRound: number;
 	word: string;
+	onPredictImageTime: (seconds: number) => void;
+	showCorrect: boolean;
 }
 
 export const Timer: React.FC<ITimer> = (props) => {
-	const { time, onTimeOut, round, maxRound, word } = props;
+	const {
+		time,
+		onTimeOut,
+		round,
+		maxRound,
+		word,
+		onPredictImageTime,
+		showCorrect,
+	} = props;
 	const [show, setShowNewRound] = useState<boolean>(true);
 
 	const expiryTimestamp = Date.now() + time * 1000 + 7000;
@@ -33,21 +43,21 @@ export const Timer: React.FC<ITimer> = (props) => {
 			pause();
 			return;
 		}
-		// // once at first render
-		// if (seconds === time + 7 && word === '') {
-		// 	onTimeOut();
-		// }
+
 		// once at 3 seconds after first render
 		if (seconds === time + 4 && show) {
 			setShowNewRound(false);
 		}
 		// every end of round
-		if (seconds === 4 && !show) {
+		else if (seconds === 4 && !show) {
 			setShowNewRound(true);
 			onTimeOut();
+		} else if (!show && !showCorrect) {
+			console.log('seconds: ', seconds - 4);
+			onPredictImageTime(seconds - 4);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [onTimeOut, seconds, show, time]);
+	}, [seconds, show, time]);
 	return (
 		<div>
 			{seconds > 4 ? seconds - 4 : seconds}

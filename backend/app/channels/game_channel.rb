@@ -5,7 +5,6 @@ class GameChannel < ApplicationCable::Channel
   def subscribed
     room = params[:room]
     username = params[:username]
-
     
     room_data = $redis.get(room)
     puts "room_data #{room_data}"
@@ -16,7 +15,8 @@ class GameChannel < ApplicationCable::Channel
         :active_users => Array.new, 
         :max_round => room_json['maxRound'], 
         :time_per_turn => room_json['timePerTurn'], 
-        :all_users => room_json['usernames'].sort 
+        :all_users => room_json['usernames'].sort,
+        :rank => {}
       }
     end
     
@@ -24,6 +24,7 @@ class GameChannel < ApplicationCable::Channel
     
     if !@@rooms[room][:active_users].include?(username)
       @@rooms[room][:active_users] << username
+      @@rooms[room][:rank][username] = 0
       puts "user came in #{username}"
 
       stream_from "game_#{room}"
@@ -45,7 +46,8 @@ class GameChannel < ApplicationCable::Channel
         maxRound: @@rooms[room][:max_round], 
         timePerTurn: @@rooms[room][:time_per_turn],
         word: @@rooms[room][:word],
-        round: @@rooms[room][:round]
+        round: @@rooms[room][:round],
+        rank: @@rooms[room][:rank]
       }
     end
   end
@@ -54,14 +56,16 @@ class GameChannel < ApplicationCable::Channel
     room = params[:room]
     username = params[:username]
     if data['type'] == 'end-round'
+      @@rooms[room][:score] = {}
       @@rooms[room][:number_user_end_round] ||= 0;
       @@rooms[room][:number_user_end_round] += 1
+      @@rooms[room][:rank][username] += data['score']
       
       if(@@rooms[room][:active_users].size() == @@rooms[room][:number_user_end_round])
         @@rooms[room][:word] = @@words[rand @@words.size()]
         @@rooms[room][:round] += 1
         @@rooms[room][:number_user_end_round] = 0;
-        ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room][:word], round: @@rooms[room][:round]}  
+        ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room][:word], round: @@rooms[room][:round], rank: (@@rooms[room][:rank].sort {|a1,a2| a2[1]<=>a1[1]}).to_h}
       end
       
     elsif data['type'] == 'send-message'
