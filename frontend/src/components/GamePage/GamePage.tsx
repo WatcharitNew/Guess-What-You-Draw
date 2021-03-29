@@ -11,7 +11,7 @@ import { Timer } from '../Timer/Timer';
 import styles from './GamePage.module.scss';
 import consumer from '../cable';
 import { EndGameModal } from '../NiceModal/EndGameModal';
-import { CorrectPredictionModal } from '../NiceModal/CorrectPredictionModal';
+import { CorrectPrediction } from '../CorrectPrediction/CorrectPrediction';
 
 interface RouteParams {
 	room: string;
@@ -162,6 +162,23 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		setShowEndGameModal(true);
 	}
 
+	const canvasComponent = (
+		<Canvas
+			color={color}
+			reset={reset}
+			setReset={setReset}
+			onPredictImage={onPredictImage}
+			className={styles.canvas}
+			getImageData={getImageData}
+		/>
+	);
+
+	const correctPredictionCompoent = (
+		<CorrectPrediction />
+	);
+
+	const midComponent = showCorrectModal ? correctPredictionCompoent : canvasComponent
+
 	return (
 		<div>
 			<div className={styles.background}>
@@ -189,14 +206,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 						players={rankPlayers}
 						username={username}
 					/>
-					<Canvas
-						color={color}
-						reset={reset}
-						setReset={setReset}
-						onPredictImage={onPredictImage}
-						className={styles.canvas}
-						getImageData={getImageData}
-					/>
+					{midComponent}
 					<ChatBox
 						className={styles.chatBox}
 						messages={messages}
@@ -207,7 +217,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				<div className={styles.bottom}>
 					<Toolbar setColor={setColor} setReset={setReset} />
 				</div>
-				<CorrectPredictionModal show={showCorrectModal} />
 				<EndGameModal
 					show={showEndGameModal}
 					room={room}
