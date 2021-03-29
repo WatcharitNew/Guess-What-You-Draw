@@ -70,6 +70,8 @@ class GameChannel < ApplicationCable::Channel
       
     elsif data['type'] == 'send-message'
       ActionCable.server.broadcast("game_#{room}", {type: 'recieve-message', sender: username, content: data['content']})
+    elsif data['type'] == 'new-drawed-label-image'
+      ActionCable.server.broadcast("game_#{room}", {type: 'recieve-drawed-label-image', content: data['content']})
     end
   end
 
