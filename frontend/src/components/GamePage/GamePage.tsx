@@ -84,6 +84,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			});
 			setIsLoading(false);
 			setRankPlayers(newRankPlayers);
+			setMessages((messages: IMessage[]) => [...messages, {content: `round 1 [${word}] start`}]);
 		} else if (data.type === 'random-word') {
 			const { content, round, rank } = data;
 			console.log(data);
@@ -98,6 +99,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				});
 			});
 			setRankPlayers(newRankPlayers);
+			setMessages((messages: IMessage[]) => [...messages, {content: `round ${round} [${content}] start`}]);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
 		} else if (data.type === 'recieve-message') {
@@ -117,7 +119,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		setScore(10 * seconds);
 		setShowCorrectModal(true);
 
-		gameChannel.send({ type: 'new-drawed-label-image', content: `${username} finish round ${round} at ${seconds} second(s) remaining` });
+		gameChannel.send({ type: 'new-drawed-label-image', content: `${username} finish at ${seconds} second(s) remaining` });
 	}
 
 	// Todo: change to real model, Now: Mock model
