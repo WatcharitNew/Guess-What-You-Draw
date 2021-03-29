@@ -52,7 +52,7 @@ export const Timer: React.FC<ITimer> = (props) => {
 		else if (seconds === 4 && !show) {
 			setShowNewRound(true);
 			onTimeOut();
-		} else if (!show && !showCorrect) {
+		} else if (!show && !showCorrect && seconds-4 >= 0) {
 			console.log('seconds: ', seconds - 4);
 			onPredictImageTime(seconds - 4);
 		}
