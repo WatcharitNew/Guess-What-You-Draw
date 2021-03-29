@@ -84,6 +84,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			});
 			setIsLoading(false);
 			setRankPlayers(newRankPlayers);
+			setMessages((messages: IMessage[]) => [...messages, {content: `round 1 [${word}] start`}]);
 		} else if (data.type === 'random-word') {
 			const { content, round, rank } = data;
 			console.log(data);
@@ -98,10 +99,14 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				});
 			});
 			setRankPlayers(newRankPlayers);
+			setMessages((messages: IMessage[]) => [...messages, {content: `round ${round} [${content}] start`}]);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
 		} else if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [...messages, data]);
+		} else if (data.type === 'recieve-drawed-label-image') {
+			console.log(data);
+			setMessages((messages: IMessage[]) => [...messages, {content: data['content']}]);
 		}
 	};
 
@@ -109,6 +114,13 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		setSeconds(seconds);
 		setGetImageData(true);
 	};
+
+	const onDrawedLabelImage = () => {
+		setScore(10 * seconds);
+		setShowCorrectModal(true);
+
+		gameChannel.send({ type: 'new-drawed-label-image', content: `${username} finish at ${seconds} second(s) remaining` });
+	}
 
 	// Todo: change to real model, Now: Mock model
 	const onPredictImage = (image: any) => {
@@ -124,8 +136,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			predictedWord1 === predictedWord2 &&
 			predictedWord === predictedWord1
 		) {
-			setScore(10 * seconds);
-			setShowCorrectModal(true);
+			onDrawedLabelImage();
 		}
 	};
 
