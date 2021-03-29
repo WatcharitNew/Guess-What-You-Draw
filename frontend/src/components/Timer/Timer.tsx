@@ -32,10 +32,12 @@ export const Timer: React.FC<ITimer> = (props) => {
 		restart(newTime);
 	};
 
-	const { seconds, restart, pause } = useTimer({
+	const { minutes, seconds: secondsWithoutMinutes, restart, pause } = useTimer({
 		expiryTimestamp,
 		onExpire: _onTimeOut,
 	});
+
+	const seconds = minutes * 60 + secondsWithoutMinutes
 
 	useEffect(() => {
 		if (round > maxRound) {
