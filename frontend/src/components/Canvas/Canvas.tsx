@@ -7,7 +7,7 @@ interface ICanvas {
 	color: ColorCode;
 	reset: boolean;
 	setReset: (reset: boolean) => void;
-	onPredictImage: (image: any) => void;
+	onPredictImage: (image: number[][][]) => void;
 	className?: string;
 	getImageData: boolean;
 }
@@ -43,7 +43,18 @@ export const Canvas: React.FC<ICanvas> = (props) => {
 		}
 
 		if (getImageData) {
-			onPredictImage(canvas?.toDataURL());
+			const imageArray = ctx?.getImageData(0, 0, WIDTH, HEIGHT).data;
+			const lightLayer =
+				imageArray && imageArray.filter((image, idx) => (idx - 3) % 4 === 0);
+
+			const lightLayer2d: number[][] = [];
+			if (lightLayer) {
+				for (let i = 0; i < lightLayer.length; i += WIDTH) {
+					lightLayer2d.push(Array.from(lightLayer.slice(i, i + WIDTH)));
+				}
+			}
+
+			onPredictImage([lightLayer2d, lightLayer2d, lightLayer2d]);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [canvas, reset, getImageData]);

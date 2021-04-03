@@ -111,22 +111,23 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	};
 
 	// Todo: change to real model, Now: Mock model
-	const onPredictImage = (image: any) => {
+	const onPredictImage = (image: number[][][]) => {
 		setGetImageData(false);
-		const words = ['cat', 'dog', 'goat'];
-		const predictedWord = words[Math.floor(Math.random() * words.length)];
-		const predictedWord1 = words[Math.floor(Math.random() * words.length)];
-		const predictedWord2 = words[Math.floor(Math.random() * words.length)];
 
-		if (
-			!showCorrectModal &&
-			predictedWord === word &&
-			predictedWord1 === predictedWord2 &&
-			predictedWord === predictedWord1
-		) {
-			setScore(10 * seconds);
-			setShowCorrectModal(true);
-		}
+		// const words = ['cat', 'dog', 'goat'];
+		// const predictedWord = words[Math.floor(Math.random() * words.length)];
+		// const predictedWord1 = words[Math.floor(Math.random() * words.length)];
+		// const predictedWord2 = words[Math.floor(Math.random() * words.length)];
+
+		// if (
+		// 	!showCorrectModal &&
+		// 	predictedWord === word &&
+		// 	predictedWord1 === predictedWord2 &&
+		// 	predictedWord === predictedWord1
+		// ) {
+		// 	setScore(10 * seconds);
+		// 	setShowCorrectModal(true);
+		// }
 	};
 
 	const onTimeOut = () => {
