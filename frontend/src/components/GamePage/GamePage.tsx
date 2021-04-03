@@ -11,7 +11,7 @@ import { Timer } from '../Timer/Timer';
 import styles from './GamePage.module.scss';
 import consumer from '../cable';
 import { EndGameModal } from '../NiceModal/EndGameModal';
-import { CorrectPredictionModal } from '../NiceModal/CorrectPredictionModal';
+import { CorrectPrediction } from '../CorrectPrediction/CorrectPrediction';
 
 interface RouteParams {
 	room: string;
@@ -84,6 +84,10 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			});
 			setIsLoading(false);
 			setRankPlayers(newRankPlayers);
+			setMessages((messages: IMessage[]) => [
+				...messages,
+				{ content: `round 1 [${word}] start` },
+			]);
 		} else if (data.type === 'random-word') {
 			const { content, round, rank } = data;
 			console.log(data);
@@ -98,10 +102,20 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				});
 			});
 			setRankPlayers(newRankPlayers);
+			setMessages((messages: IMessage[]) => [
+				...messages,
+				{ content: `round ${round} [${content}] start` },
+			]);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
 		} else if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [...messages, data]);
+		} else if (data.type === 'recieve-drawed-label-image') {
+			console.log(data);
+			setMessages((messages: IMessage[]) => [
+				...messages,
+				{ content: data['content'] },
+			]);
 		}
 	};
 
@@ -110,24 +124,32 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		setGetImageData(true);
 	};
 
+	const onDrawedLabelImage = () => {
+		setScore(10 * seconds);
+		setShowCorrectModal(true);
+
+		gameChannel.send({
+			type: 'new-drawed-label-image',
+			content: `${username} finish at ${seconds} second(s) remaining`,
+		});
+	};
+
 	// Todo: change to real model, Now: Mock model
 	const onPredictImage = (image: number[][][]) => {
 		setGetImageData(false);
+		const words = ['cat', 'dog', 'goat'];
+		const predictedWord = words[Math.floor(Math.random() * words.length)];
+		const predictedWord1 = words[Math.floor(Math.random() * words.length)];
+		const predictedWord2 = words[Math.floor(Math.random() * words.length)];
 
-		// const words = ['cat', 'dog', 'goat'];
-		// const predictedWord = words[Math.floor(Math.random() * words.length)];
-		// const predictedWord1 = words[Math.floor(Math.random() * words.length)];
-		// const predictedWord2 = words[Math.floor(Math.random() * words.length)];
-
-		// if (
-		// 	!showCorrectModal &&
-		// 	predictedWord === word &&
-		// 	predictedWord1 === predictedWord2 &&
-		// 	predictedWord === predictedWord1
-		// ) {
-		// 	setScore(10 * seconds);
-		// 	setShowCorrectModal(true);
-		// }
+		if (
+			!showCorrectModal &&
+			predictedWord === word &&
+			predictedWord1 === predictedWord2 &&
+			predictedWord === predictedWord1
+		) {
+			onDrawedLabelImage();
+		}
 	};
 
 	const onTimeOut = () => {
@@ -151,6 +173,23 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	if (round > maxRound && !showEndGameModal) {
 		setShowEndGameModal(true);
 	}
+
+	const canvasComponent = (
+		<Canvas
+			color={color}
+			reset={reset}
+			setReset={setReset}
+			onPredictImage={onPredictImage}
+			className={styles.canvas}
+			getImageData={getImageData}
+		/>
+	);
+
+	const correctPredictionCompoent = <CorrectPrediction />;
+
+	const midComponent = showCorrectModal
+		? correctPredictionCompoent
+		: canvasComponent;
 
 	return (
 		<div>
@@ -179,14 +218,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 						players={rankPlayers}
 						username={username}
 					/>
-					<Canvas
-						color={color}
-						reset={reset}
-						setReset={setReset}
-						onPredictImage={onPredictImage}
-						className={styles.canvas}
-						getImageData={getImageData}
-					/>
+					{midComponent}
 					<ChatBox
 						className={styles.chatBox}
 						messages={messages}
@@ -197,7 +229,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				<div className={styles.bottom}>
 					<Toolbar setColor={setColor} setReset={setReset} />
 				</div>
-				<CorrectPredictionModal show={showCorrectModal} />
 				<EndGameModal
 					show={showEndGameModal}
 					room={room}

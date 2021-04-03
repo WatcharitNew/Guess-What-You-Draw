@@ -32,10 +32,12 @@ export const Timer: React.FC<ITimer> = (props) => {
 		restart(newTime);
 	};
 
-	const { seconds, restart, pause } = useTimer({
+	const { minutes, seconds: secondsWithoutMinutes, restart, pause } = useTimer({
 		expiryTimestamp,
 		onExpire: _onTimeOut,
 	});
+
+	const seconds = minutes * 60 + secondsWithoutMinutes
 
 	useEffect(() => {
 		if (round > maxRound) {
@@ -52,7 +54,7 @@ export const Timer: React.FC<ITimer> = (props) => {
 		else if (seconds === 4 && !show) {
 			setShowNewRound(true);
 			onTimeOut();
-		} else if (!show && !showCorrect) {
+		} else if (!show && !showCorrect && seconds-4 >= 0) {
 			console.log('seconds: ', seconds - 4);
 			onPredictImageTime(seconds - 4);
 		}
