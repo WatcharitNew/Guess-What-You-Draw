@@ -137,7 +137,10 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	// Todo: change to real model, Now: Mock model
 	const onPredictImage = (image: number[][][]) => {
 		setGetImageData(false);
-		const words = ['cat', 'dog', 'goat'];
+		const words = ['alarm clock', 'anvil', 'apple', 'bat', 'bed', 'bucket', 'butterfly', 'camera', 
+                  'circle', 'cup', 'diamond', 'dog', 'dolphin', 'eye', 'finger', 'fish', 'flashlight', 
+                  'flip flops', 'frog', 'hamburger', 'hand', 'headphones', 'hexagon', 'ice cream', 'keyboard', 
+                  'light bulb', 'moon', 'mountain', 'nail', 'octagon'];
 		const predictedWord = words[Math.floor(Math.random() * words.length)];
 		const predictedWord1 = words[Math.floor(Math.random() * words.length)];
 		const predictedWord2 = words[Math.floor(Math.random() * words.length)];
