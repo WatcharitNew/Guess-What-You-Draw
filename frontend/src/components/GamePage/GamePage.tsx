@@ -12,6 +12,7 @@ import styles from './GamePage.module.scss';
 import consumer from '../cable';
 import { EndGameModal } from '../NiceModal/EndGameModal';
 import { CorrectPrediction } from '../CorrectPrediction/CorrectPrediction';
+import { predictImage } from './Predictor';
 
 interface RouteParams {
 	room: string;
@@ -135,19 +136,18 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	};
 
 	// Todo: change to real model, Now: Mock model
-	const onPredictImage = (image: number[][][]) => {
+	const onPredictImage = (image: number[][]) => {
 		setGetImageData(false);
 		const words = ['cat', 'dog', 'goat'];
 		const predictedWord = words[Math.floor(Math.random() * words.length)];
 		const predictedWord1 = words[Math.floor(Math.random() * words.length)];
 		const predictedWord2 = words[Math.floor(Math.random() * words.length)];
+		// const predictedResult = predictedWord === word &&
+		// predictedWord1 === predictedWord2 &&
+		// predictedWord === predictedWord1;
+		const predictedResult = predictImage(image);
 
-		if (
-			!showCorrectModal &&
-			predictedWord === word &&
-			predictedWord1 === predictedWord2 &&
-			predictedWord === predictedWord1
-		) {
+		if (!showCorrectModal && false) {
 			onDrawedLabelImage();
 		}
 	};
