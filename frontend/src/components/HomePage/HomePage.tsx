@@ -72,9 +72,9 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 		setUsername(newName.trim());
 	}
 
-	const onTest = () => {
+	const onTest = async () => {
 		console.log('Try import model');
-		predictImage([]);
+		console.log(await predictImage([[]]));
 	}
 
 	return (

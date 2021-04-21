@@ -136,7 +136,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	};
 
 	// Todo: change to real model, Now: Mock model
-	const onPredictImage = (image: number[][]) => {
+	const onPredictImage = async (image: number[][]) => {
 		setGetImageData(false);
 		const words = ['cat', 'dog', 'goat'];
 		const predictedWord = words[Math.floor(Math.random() * words.length)];
@@ -145,7 +145,8 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		// const predictedResult = predictedWord === word &&
 		// predictedWord1 === predictedWord2 &&
 		// predictedWord === predictedWord1;
-		const predictedResult = predictImage(image);
+		const predictedResult = await predictImage(image);
+		console.log(predictedResult);
 
 		if (!showCorrectModal && false) {
 			onDrawedLabelImage();
