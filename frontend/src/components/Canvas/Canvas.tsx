@@ -12,8 +12,8 @@ interface ICanvas {
 	getImageData: boolean;
 }
 
-const WIDTH = 732;
-const HEIGHT = 488;
+const WIDTH = 672;
+const HEIGHT = 448;
 
 export const Canvas: React.FC<ICanvas> = (props) => {
 	const {
@@ -42,19 +42,6 @@ export const Canvas: React.FC<ICanvas> = (props) => {
 			setReset(false);
 		}
 
-		if (getImageData) {
-			const imageArray = ctx?.getImageData(0, 0, WIDTH, HEIGHT).data;
-			const lightLayer =
-				imageArray && imageArray.filter((image, idx) => (idx - 3) % 4 === 0);
-			const lightLayer2d: number[][] = [];
-			if (lightLayer) {
-				for (let i = 0; i < lightLayer.length; i += WIDTH) {
-					lightLayer2d.push(Array.from(lightLayer.slice(i, i + WIDTH)));
-				}
-			}
-
-			onPredictImage(lightLayer2d);
-		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [canvas, reset, getImageData]);
 
@@ -70,10 +57,25 @@ export const Canvas: React.FC<ICanvas> = (props) => {
 		}
 	};
 
-	const stopDrawing = () => {
+	const stopDrawing = async () => {
 		if (ctx) {
 			ctx.closePath();
 			setIsDrawing(false);
+			if (getImageData) {
+				const imageArray = ctx?.getImageData(0, 0, WIDTH, HEIGHT).data;
+				const lightLayer =
+					imageArray && imageArray.filter((image, idx) => (idx - 3) % 4 === 0);
+				const lightLayer2d: number[][] = [];
+				if (lightLayer) {
+					for (let i = 0; i < lightLayer.length; i += WIDTH) {
+						lightLayer2d.push(Array.from(lightLayer.slice(i, i + WIDTH)));
+					}
+				}
+	
+				new Promise((resolve, reject) => {
+					resolve(onPredictImage(lightLayer2d));
+				});
+			}
 		}
 	};
 

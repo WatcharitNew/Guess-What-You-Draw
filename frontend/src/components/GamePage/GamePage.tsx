@@ -135,22 +135,18 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		});
 	};
 
-	// Todo: change to real model, Now: Mock model
-	const onPredictImage = async (image: number[][]) => {
+	// Todo: set image id
+	const onPredictImage = (image: number[][]) => {
 		setGetImageData(false);
-		const words = ['cat', 'dog', 'goat'];
-		const predictedWord = words[Math.floor(Math.random() * words.length)];
-		const predictedWord1 = words[Math.floor(Math.random() * words.length)];
-		const predictedWord2 = words[Math.floor(Math.random() * words.length)];
-		// const predictedResult = predictedWord === word &&
-		// predictedWord1 === predictedWord2 &&
-		// predictedWord === predictedWord1;
-		const predictedResult = await predictImage(image);
-		console.log(predictedResult);
-
-		if (!showCorrectModal && false) {
-			onDrawedLabelImage();
-		}
+		const imageID = 0; // mock
+		new Promise((resolve, reject) => {
+			resolve(predictImage(image));
+		}).then((predictedImageID) => {
+			console.log(predictedImageID);
+			if(!showCorrectModal && predictedImageID === imageID) {
+				onDrawedLabelImage();
+			}
+		});
 	};
 
 	const onTimeOut = () => {

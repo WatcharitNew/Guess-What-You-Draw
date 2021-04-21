@@ -1,4 +1,5 @@
 import { Tensor, InferenceSession } from "onnxjs";
+const softmax = require('softmax-fn');
 
 // def preprocess_onnx(inputImage):
 //   outputImage = cv2.cvtColor(inputImage, cv2.COLOR_GRAY2RGB)
@@ -43,10 +44,11 @@ const resizeAndNormalizeImage = (imageGray: number[][]) => {
 const grayToRGBAndTransformToZ = (imageGray: number[][]) => {
     const HEIGHT = imageGray.length;
     const WIDTH = imageGray[0].length;
-    const imageRGB: number[][][] = [];
+    const imageR: number[][] = [];
+    const imageG: number[][] = [];
+    const imageB: number[][] = [];
 
     for(let i=0; i<HEIGHT; i++) {
-        const imageRGBRow: number[][] = [];
         const imageRRow: number[] = [];
         const imageGRow: number[] = [];
         const imageBRow: number[] = [];
@@ -55,13 +57,12 @@ const grayToRGBAndTransformToZ = (imageGray: number[][]) => {
             imageGRow.push((imageGray[i][j]-0.456)/0.224);
             imageBRow.push((imageGray[i][j]-0.406)/0.225);
         }
-        imageRGBRow.push(imageRRow);
-        imageRGBRow.push(imageGRow);
-        imageRGBRow.push(imageBRow);
-        imageRGB.push(imageRGBRow);
+        imageR.push(imageRRow);
+        imageG.push(imageGRow);
+        imageB.push(imageBRow);
     }
 
-    return imageRGB;
+    return [imageR, imageG, imageB];
 }
 
 const flatten = (imageRGB: number[][][]) => {
@@ -83,7 +84,7 @@ const preprocessImage = (imageGray: number[][]) => {
     const resizedAndNormalizedImage: number[][] = resizeAndNormalizeImage(imageGray);
     const imageRGB: number[][][] = grayToRGBAndTransformToZ(resizedAndNormalizedImage);
     const flattenImageRGB: number[] = flatten(imageRGB);
-    const inputTensor = new onnx.Tensor(flattenImageRGB, 'float32', [1, 3, 244, 244]);
+    const inputTensor = new onnx.Tensor(flattenImageRGB, 'float32', [1, 3, 224, 224]);
     return inputTensor;
 }
 
@@ -92,16 +93,25 @@ const session = new InferenceSession();
 const url = '/50-doodleNet-v1-2.onnx';
 session.loadModel(url);
 
-export const predictImage = async (imageGray: number[][]) => {
-    
+const argMax = (array: number[]) => array.map((el, idx) => [el, idx]);
 
+export const predictImage = async (imageGray: number[][]) => {
     // // creating an array of input Tensors is the easiest way. For other options see the API documentation
-    // const inputTensor: Tensor = preprocessImage(imageGray);
+    const inputTensor: Tensor = preprocessImage(imageGray);
     
     // // // run this in an async method:
-    // const outputMap = await session.run([inputTensor]);
-    // const outputTensor = outputMap.values().next().value;
-    // console.log(outputTensor);
-    console.log(session);
-    return false;
+    const predictedLabel = await session.run([inputTensor]).then((outputMap) => {
+        const pred = outputMap.values().next().value.data;
+        const softmaxPred = softmax(pred);
+        let max = -1;
+        let maxId = -1;
+        softmaxPred.forEach((value: number, idx: number) => {
+            if(value > max) {
+                max = value;
+                maxId = idx;
+            }
+        });
+        return maxId;
+    });
+    return predictedLabel;
 }
