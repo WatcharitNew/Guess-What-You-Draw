@@ -90,17 +90,15 @@ const preprocessImage = (imageGray: number[][]) => {
 
 const session = new InferenceSession();
 // use the following in an async method
-const url = '/50-doodleNet-v1-2.onnx';
+const url = '/50-doodleNet-v3.onnx';
 session.loadModel(url);
 
-const argMax = (array: number[]) => array.map((el, idx) => [el, idx]);
-
-export const predictImage = async (imageGray: number[][]) => {
-    // // creating an array of input Tensors is the easiest way. For other options see the API documentation
+export const predictImage = (imageGray: number[][]) => {
+    // creating an array of input Tensors is the easiest way. For other options see the API documentation
     const inputTensor: Tensor = preprocessImage(imageGray);
     
-    // // // run this in an async method:
-    const predictedLabel = await session.run([inputTensor]).then((outputMap) => {
+    // run this in an async method:
+    return session.run([inputTensor]).then((outputMap) => {
         const pred = outputMap.values().next().value.data;
         const softmaxPred = softmax(pred);
         let max = -1;
@@ -113,5 +111,4 @@ export const predictImage = async (imageGray: number[][]) => {
         });
         return maxId;
     });
-    return predictedLabel;
 }
