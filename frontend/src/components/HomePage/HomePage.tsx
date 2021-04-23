@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import { Button, TextField } from '@material-ui/core';
 import { RouteComponentProps, useHistory } from 'react-router';
 import axios from 'axios'
-import { predictImage } from '../GamePage/Predictor';
 
 const ENDPOINT = process.env.REACT_APP_BACKEND || "http://localhost:10000";
 
@@ -72,11 +71,6 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 		setUsername(newName.trim());
 	}
 
-	const onTest = async () => {
-		console.log('Try import model');
-		console.log(await predictImage([[]]));
-	}
-
 	return (
 		<div className={styles.background}>
 			<div className={styles.titleSection}>
@@ -101,9 +95,6 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 			</div>
 			<Button className={styles.playButton} variant="contained" color="primary" onClick={onSubmit}>
 				{room? 'Join' : 'Create room'}
-			</Button>
-			<Button className={styles.playButton} variant="contained" color="primary" onClick={onTest}>
-				test
 			</Button>
 			<span className={styles.nameErrorText}>{nameErrorText}</span>
 		</div>
