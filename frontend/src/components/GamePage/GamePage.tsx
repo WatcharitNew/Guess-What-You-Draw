@@ -12,6 +12,7 @@ import styles from './GamePage.module.scss';
 import consumer from '../cable';
 import { EndGameModal } from '../NiceModal/EndGameModal';
 import { CorrectPrediction } from '../CorrectPrediction/CorrectPrediction';
+import { predictImage } from './Predictor';
 
 interface RouteParams {
 	room: string;
@@ -134,25 +135,23 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		});
 	};
 
-	// Todo: change to real model, Now: Mock model
-	const onPredictImage = (image: number[][][]) => {
+	// Todo: set image id
+	const onPredictImage = (image: number[][]) => {
 		setGetImageData(false);
+
 		const words = ['alarm clock', 'anvil', 'apple', 'bat', 'bed', 'bucket', 'butterfly', 'camera', 
                   'circle', 'cup', 'diamond', 'dog', 'dolphin', 'eye', 'finger', 'fish', 'flashlight', 
                   'flip flops', 'frog', 'hamburger', 'hand', 'headphones', 'hexagon', 'ice cream', 'keyboard', 
                   'light bulb', 'moon', 'mountain', 'nail', 'octagon'];
-		const predictedWord = words[Math.floor(Math.random() * words.length)];
-		const predictedWord1 = words[Math.floor(Math.random() * words.length)];
-		const predictedWord2 = words[Math.floor(Math.random() * words.length)];
-
-		if (
-			!showCorrectModal &&
-			predictedWord === word &&
-			predictedWord1 === predictedWord2 &&
-			predictedWord === predictedWord1
-		) {
-			onDrawedLabelImage();
-		}
+		const imageID = 0; // mock todo:
+		new Promise((resolve, reject) => {
+			resolve(predictImage(image));
+		}).then((predictedImageID) => {
+			console.log(predictedImageID);
+			if(!showCorrectModal && predictedImageID === imageID) {
+				onDrawedLabelImage();
+			}
+		});
 	};
 
 	const onTimeOut = () => {

@@ -55,7 +55,6 @@ export const Timer: React.FC<ITimer> = (props) => {
 			setShowNewRound(true);
 			onTimeOut();
 		} else if (!show && !showCorrect && seconds-4 >= 0) {
-			console.log('seconds: ', seconds - 4);
 			onPredictImageTime(seconds - 4);
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
