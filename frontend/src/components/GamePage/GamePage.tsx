@@ -138,7 +138,12 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	// Todo: set image id
 	const onPredictImage = (image: number[][]) => {
 		setGetImageData(false);
-		const imageID = 0; // mock
+
+		const words = ['alarm clock', 'anvil', 'apple', 'bat', 'bed', 'bucket', 'butterfly', 'camera', 
+                  'circle', 'cup', 'diamond', 'dog', 'dolphin', 'eye', 'finger', 'fish', 'flashlight', 
+                  'flip flops', 'frog', 'hamburger', 'hand', 'headphones', 'hexagon', 'ice cream', 'keyboard', 
+                  'light bulb', 'moon', 'mountain', 'nail', 'octagon'];
+		const imageID = 0; // mock todo:
 		new Promise((resolve, reject) => {
 			resolve(predictImage(image));
 		}).then((predictedImageID) => {

@@ -1,6 +1,9 @@
 class GameChannel < ApplicationCable::Channel
   @@rooms = Hash.new()
-  @@words = %w[cat dog goat]
+  @@words = ['alarm clock', 'anvil', 'apple', 'bat', 'bed', 'bucket', 'butterfly', 'camera', 
+            'circle', 'cup', 'diamond', 'dog', 'dolphin', 'eye', 'finger', 'fish', 'flashlight', 
+            'flip flops', 'frog', 'hamburger', 'hand', 'headphones', 'hexagon', 'ice cream', 'keyboard', 
+            'light bulb', 'moon', 'mountain', 'nail', 'octagon']
 
   def subscribed
     room = params[:room]
