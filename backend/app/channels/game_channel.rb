@@ -1,9 +1,5 @@
 class GameChannel < ApplicationCable::Channel
   @@rooms = Hash.new()
-  @@words = ['alarm clock', 'anvil', 'apple', 'bat', 'bed', 'bucket', 'butterfly', 'camera', 
-            'circle', 'cup', 'diamond', 'dog', 'dolphin', 'eye', 'finger', 'fish', 'flashlight', 
-            'flip flops', 'frog', 'hamburger', 'hand', 'headphones', 'hexagon', 'ice cream', 'keyboard', 
-            'light bulb', 'moon', 'mountain', 'nail', 'octagon']
 
   def subscribed
     room = params[:room]
@@ -41,14 +37,14 @@ class GameChannel < ApplicationCable::Channel
      
     if @@rooms[room][:active_users].sort == @@rooms[room][:all_users]
       @@rooms[room][:round] = 1
-      random_word(room)
+      random_word_id(room)
 
       ActionCable.server.broadcast "game_#{room}", { 
         type: 'game-start', 
         usernames: @@rooms[room][:all_users], 
         maxRound: @@rooms[room][:max_round], 
         timePerTurn: @@rooms[room][:time_per_turn],
-        word: @@rooms[room][:word],
+        word_id: @@rooms[room][:word_id],
         round: @@rooms[room][:round],
         rank: @@rooms[room][:rank]
       }
@@ -65,10 +61,10 @@ class GameChannel < ApplicationCable::Channel
       @@rooms[room][:rank][username] += data['score']
       
       if(@@rooms[room][:active_users].size() == @@rooms[room][:number_user_end_round])
-        @@rooms[room][:word] = @@words[rand @@words.size()]
+        random_word_id(room)
         @@rooms[room][:round] += 1
         @@rooms[room][:number_user_end_round] = 0;
-        ActionCable.server.broadcast "game_#{room}", {type: 'random-word', content: @@rooms[room][:word], round: @@rooms[room][:round], rank: (@@rooms[room][:rank].sort {|a1,a2| a2[1]<=>a1[1]}).to_h}
+        ActionCable.server.broadcast "game_#{room}", {type: 'random-word', word_id: @@rooms[room][:word_id], round: @@rooms[room][:round], rank: (@@rooms[room][:rank].sort {|a1,a2| a2[1]<=>a1[1]}).to_h}
       end
       
     elsif data['type'] == 'send-message'
@@ -98,7 +94,7 @@ class GameChannel < ApplicationCable::Channel
 
   private
 
-  def random_word(room)
-    @@rooms[room][:word] = @@words[rand @@words.length()]
+  def random_word_id(room)
+    @@rooms[room][:word_id] = rand 50
   end
 end

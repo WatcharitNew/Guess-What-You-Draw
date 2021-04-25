@@ -30,14 +30,24 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [round, setRound] = useState(1);
 	const [maxRound, setMaxRound] = useState<number>(5);
 	const [timePerTurn, setTimePerTurn] = useState<number>(0);
-	const [word, setWord] = useState<string>('');
+	const [wordID, setWordID] = useState<number>(0);
 	const [showCorrectModal, setShowCorrectModal] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [showEndGameModal, setShowEndGameModal] = useState<boolean>(false);
 	const [getImageData, setGetImageData] = useState<boolean>(false);
 	const [seconds, setSeconds] = useState<number>(0);
+  const [classLabel, setClassLabel] = useState<Array<string>>([]);
 
 	useEffect(() => {
+    if(classLabel.length === 0) {
+      fetch('/class.txt')
+        .then((r) => r.text())
+        .then(text => {
+          const textList = text.split('\r\n');
+          setClassLabel(textList.slice(0, textList.length - 1));
+        })  
+    }
+
 		console.log('a');
 		const channel = consumer.subscriptions.create(
 			{
@@ -70,11 +80,11 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		}
 		if (data.type === 'game-start') {
 			console.log('game start');
-			const { maxRound, timePerTurn, word, round, rank } = data;
+			const { maxRound, timePerTurn, word_id, round, rank } = data;
 			console.log('rank: ', typeof rank);
 			setMaxRound(maxRound);
 			setTimePerTurn(timePerTurn);
-			setWord(word);
+			setWordID(word_id);
 			setRound(round);
 			const newRankPlayers: IPlayer[] = [];
 			Object.entries(rank).forEach(([key, value]) => {
@@ -85,14 +95,10 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			});
 			setIsLoading(false);
 			setRankPlayers(newRankPlayers);
-			setMessages((messages: IMessage[]) => [
-				...messages,
-				{ content: `round 1 [${word}] start` },
-			]);
 		} else if (data.type === 'random-word') {
-			const { content, round, rank } = data;
+			const { word_id, round, rank } = data;
 			console.log(data);
-			setWord(content);
+			setWordID(word_id);
 			setRound(round);
 			setReset(true);
 			const newRankPlayers: IPlayer[] = [];
@@ -103,10 +109,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				});
 			});
 			setRankPlayers(newRankPlayers);
-			setMessages((messages: IMessage[]) => [
-				...messages,
-				{ content: `round ${round} [${content}] start` },
-			]);
 		} else if (data.type === 'receive-result') {
 			console.log(data.content);
 		} else if (data.type === 'recieve-message') {
@@ -139,16 +141,11 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const onPredictImage = (image: number[][]) => {
 		setGetImageData(false);
 
-		const words = ['alarm clock', 'anvil', 'apple', 'bat', 'bed', 'bucket', 'butterfly', 'camera', 
-                  'circle', 'cup', 'diamond', 'dog', 'dolphin', 'eye', 'finger', 'fish', 'flashlight', 
-                  'flip flops', 'frog', 'hamburger', 'hand', 'headphones', 'hexagon', 'ice cream', 'keyboard', 
-                  'light bulb', 'moon', 'mountain', 'nail', 'octagon'];
-		const imageID = 0; // mock todo:
 		new Promise((resolve, reject) => {
 			resolve(predictImage(image));
 		}).then((predictedImageID) => {
 			console.log(predictedImageID);
-			if(!showCorrectModal && predictedImageID === imageID) {
+			if(!showCorrectModal && predictedImageID === wordID) {
 				onDrawedLabelImage();
 			}
 		});
@@ -200,7 +197,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 					<div className={styles.round}>
 						Round {round}/{maxRound}
 					</div>
-					<div className={styles.word}>Word: {word}</div>
+					<div className={styles.word}>Word: {classLabel[wordID]}</div>
 					<div className={styles.time}>
 						Time:{' '}
 						<Timer
@@ -208,7 +205,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 							onTimeOut={onTimeOut}
 							round={round}
 							maxRound={maxRound}
-							word={word}
+							word={classLabel[wordID]}
 							onPredictImageTime={onPredictImageTime}
 							showCorrect={showCorrectModal}
 						/>
