@@ -144,8 +144,9 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		new Promise((resolve, reject) => {
 			resolve(predictImage(image));
 		}).then((predictedImageID) => {
-			console.log(predictedImageID);
-			if(!showCorrectModal && predictedImageID === wordID) {
+      const predictedID = predictedImageID as number;
+			console.log(classLabel[predictedID]);
+			if(!showCorrectModal && predictedID === wordID) {
 				onDrawedLabelImage();
 			}
 		});
