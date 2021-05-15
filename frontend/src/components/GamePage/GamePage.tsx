@@ -79,7 +79,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		if (data.type === 'game-start') {
 			console.log('game start');
 			const { maxRound, timePerTurn, word_id, round, rank } = data;
-			console.log('rank: ', typeof rank);
 			setMaxRound(maxRound);
 			setTimePerTurn(timePerTurn);
 			setWordID(word_id);
@@ -95,7 +94,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			setRankPlayers(newRankPlayers);
 		} else if (data.type === 'random-word') {
 			const { word_id, round, rank } = data;
-			console.log(data);
 			setWordID(word_id);
 			setRound(round);
 			setReset(true);
@@ -107,12 +105,9 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 				});
 			});
 			setRankPlayers(newRankPlayers);
-		} else if (data.type === 'receive-result') {
-			console.log(data.content);
 		} else if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [...messages, data]);
 		} else if (data.type === 'recieve-drawed-label-image') {
-			console.log(data);
 			setMessages((messages: IMessage[]) => [
 				...messages,
 				{ content: data['content'] },
@@ -144,7 +139,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		}).then((predictedImageID) => {
       const predictedID = predictedImageID as number;
 
-			console.log(classLabel[predictedID]);
+			console.log('model predict: ', classLabel[predictedID]);
 			if(!showCorrectModal && predictedID === wordID) {
 				onDrawedLabelImage();
 			}

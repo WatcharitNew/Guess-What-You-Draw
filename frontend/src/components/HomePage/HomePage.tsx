@@ -27,7 +27,6 @@ export const HomePage: React.FC<IHomePage> = (props) => {
 		else if(room) {
 			axios.post(`${ENDPOINT}/room/${room}`, {username: username})
 				.then((res) => {
-					console.log(res);
 					if(res.status === 200) {
 						history.push(`/room/${room}`);
 						history.go(0);

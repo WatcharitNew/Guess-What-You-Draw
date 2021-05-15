@@ -77,15 +77,12 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 			},
 			{
 				received: (data: IMessage) => handleReceived(data),
-				connected: () => console.log('connected'),
-				disconnected: () => console.log('disconnected'),
 			}
 		));
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [username, room]);
 
 	const handleReceived = (data: any) => {
-		console.log(data);
 		if (data.type === 'recieve-message') {
 			setMessages((messages: IMessage[]) => [
 				...messages,
