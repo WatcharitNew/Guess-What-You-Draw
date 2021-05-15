@@ -90,7 +90,7 @@ const preprocessImage = (imageGray: number[][]) => {
 
 const session = new InferenceSession();
 // use the following in an async method
-const url = '/50-doodleNet-v3.onnx';
+const url = '/50-doodleNet-v4-final.onnx';
 session.loadModel(url);
 
 export const predictImage = (imageGray: number[][]) => {
