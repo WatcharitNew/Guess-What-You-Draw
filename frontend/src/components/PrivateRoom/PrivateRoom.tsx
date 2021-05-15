@@ -6,6 +6,7 @@ import styles from './PrivateRoom.module.scss';
 import consumer from '../cable';
 import { IPlayer } from '../util';
 import { PlayersBox } from '../PlayersBox/PlayersBox';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 interface RouteParams {
 	room: string;
@@ -36,9 +37,6 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 	};
 
 	const inviteLink = `${window.location.host}/home/${room}`;
-	const copyToClipboard = () => {
-		navigator.clipboard.writeText(inviteLink);
-	};
 
 	const roundsSliderMarks: sliderMark[] = [
 		{
@@ -135,13 +133,17 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 
 	return (
 		<div className={styles.background}>
-			<div className={styles.inviteLinkSection} onClick={copyToClipboard}>
+			<div className={styles.inviteLinkSection}>
 				<span className={styles.inviteText}>
 					Invite your friends by this link
 				</span>
 				<div className={styles.inviteLinkAndCopyButton}>
 					<div className={styles.inviteLink}>{inviteLink}</div>
-					<div className={styles.copyButton}>copy</div>
+          <CopyToClipboard text={inviteLink}>
+            <div className={styles.copyButton}>
+              Copy
+            </div>
+          </CopyToClipboard>
 				</div>
 			</div>
 			<div className={styles.midSection}>

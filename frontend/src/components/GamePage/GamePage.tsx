@@ -43,12 +43,11 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
       fetch('/class.txt')
         .then((r) => r.text())
         .then(text => {
-          const textList = text.split('\r\n');
+          const textList = text.split('\n');
           setClassLabel(textList.slice(0, textList.length - 1));
         })  
     }
 
-		console.log('a');
 		const channel = consumer.subscriptions.create(
 			{
 				channel: 'GameChannel',
@@ -72,7 +71,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-	// }, [room, username, showNewRound, gameChannel]);
 
 	const handleGameChannelReceived = (data: any) => {
 		if (showEndGameModal) {
@@ -145,6 +143,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			resolve(predictImage(image));
 		}).then((predictedImageID) => {
       const predictedID = predictedImageID as number;
+
 			console.log(classLabel[predictedID]);
 			if(!showCorrectModal && predictedID === wordID) {
 				onDrawedLabelImage();
