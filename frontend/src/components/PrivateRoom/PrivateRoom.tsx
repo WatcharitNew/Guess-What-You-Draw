@@ -36,7 +36,7 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 		roomChannel.send({ type: 'start-room' });
 	};
 
-	const inviteLink = `${window.location.host}/home/${room}`;
+	const inviteLink = `http://${window.location.host}/home/${room}`;
 
 	const roundsSliderMarks: sliderMark[] = [
 		{
@@ -130,19 +130,19 @@ export const PrivateRoom: React.FC<IPrivateRoom> = (props: IPrivateRoom) => {
 
 	return (
 		<div className={styles.background}>
-			<div className={styles.inviteLinkSection}>
-				<span className={styles.inviteText}>
-					Invite your friends by this link
-				</span>
-				<div className={styles.inviteLinkAndCopyButton}>
-					<div className={styles.inviteLink}>{inviteLink}</div>
-          <CopyToClipboard text={inviteLink}>
+      <CopyToClipboard text={inviteLink}>
+        <div className={styles.inviteLinkSection}>
+          <span className={styles.inviteText}>
+            Invite your friends by this link
+          </span>
+          <div className={styles.inviteLinkAndCopyButton}>
+            <div className={styles.inviteLink}>{inviteLink}</div>
             <div className={styles.copyButton}>
               Copy
             </div>
-          </CopyToClipboard>
-				</div>
-			</div>
+          </div>
+        </div>
+      </CopyToClipboard>
 			<div className={styles.midSection}>
 				<div className={styles.settings}>
 					<span className={styles.midText}>Settings</span>
