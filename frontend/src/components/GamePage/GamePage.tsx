@@ -37,6 +37,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const [getImageData, setGetImageData] = useState<boolean>(false);
 	const [seconds, setSeconds] = useState<number>(0);
   const [classLabel, setClassLabel] = useState<Array<string>>([]);
+  const [modelPredictedID, setModelPredictedID] = useState<number>(-1);
 
 	useEffect(() => {
     if(classLabel.length === 0) {
@@ -130,7 +131,6 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		});
 	};
 
-	// Todo: set image id
 	const onPredictImage = (image: number[][]) => {
 		setGetImageData(false);
 
@@ -138,6 +138,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 			resolve(predictImage(image));
 		}).then((predictedImageID) => {
       const predictedID = predictedImageID as number;
+      setModelPredictedID(predictedID);
 
 			console.log('model predict: ', classLabel[predictedID]);
 			if(!showCorrectModal && predictedID === wordID) {
@@ -149,6 +150,7 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const onTimeOut = () => {
 		console.log('timeout');
 		setShowCorrectModal(false);
+    setModelPredictedID(-1);
 		gameChannel.send({ type: 'end-round', score });
 		setScore(0);
 	};
@@ -221,7 +223,12 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 					/>
 				</div>
 				<div className={styles.bottom}>
-					<Toolbar setColor={setColor} setReset={setReset} />
+          <div className={styles.modelPredictArea}>
+            { modelPredictedID !== -1 ? `Model predict: ${classLabel[modelPredictedID]}` : 'Please draw something'}
+          </div>
+          <div className={styles.toolbar}>
+					  <Toolbar setColor={setColor} setReset={setReset} />
+          </div>
 				</div>
 				<EndGameModal
 					show={showEndGameModal}

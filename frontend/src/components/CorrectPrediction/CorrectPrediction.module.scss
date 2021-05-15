@@ -2,10 +2,11 @@
 
 :local(.background) {
 	background: $green;
-	min-width: 800px;
-	min-height: 520px;
+	width: 672px;
+	height: 448px;
 	margin-left: 40px;
 	margin-right: 40px;
+  margin-top: 40px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;

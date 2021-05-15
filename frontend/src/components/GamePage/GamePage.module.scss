@@ -82,6 +82,21 @@
 
 :local(.bottom) {
 	display: flex;
+  flex-direction: column;
 	width: 280px;
-	height: 80px;
+	height: 100px;
+  margin-top: -40px;
+}
+
+:local(.modelPredictArea) {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+:local(.toolbar) {
+  display: flex;
+  height: 80px;
 }
