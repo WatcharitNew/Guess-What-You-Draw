@@ -25,10 +25,13 @@
 }
 
 :local(.orderSection) {
-	width: 20%;
+	width: 30%;
 	text-align: center;
 }
 
 :local(.nameSection) {
-	width: 80%;
+	width: 70%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
