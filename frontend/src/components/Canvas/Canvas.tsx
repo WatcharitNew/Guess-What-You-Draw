@@ -49,7 +49,7 @@ export const Canvas: React.FC<ICanvas> = (props) => {
 		if (ctx && canvas) {
 			ctx.lineJoin = 'round';
 			ctx.lineCap = 'round';
-			ctx.lineWidth = color === '#ffffff' ? 15 : 5;
+			ctx.lineWidth = 15;
 			ctx.strokeStyle = color;
 			ctx.beginPath();
 			ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
