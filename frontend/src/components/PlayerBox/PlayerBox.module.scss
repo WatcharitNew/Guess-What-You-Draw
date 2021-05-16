@@ -1,8 +1,9 @@
 @import '../variable.scss';
 
 :local(.wrapPlayerBox) {
-	position: absolute;
+	position: flex;
 	width: 100%;
+  margin-top: 12px;
 }
 
 :local(.playerBox) {

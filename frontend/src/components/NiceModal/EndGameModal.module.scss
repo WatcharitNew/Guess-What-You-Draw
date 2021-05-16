@@ -20,10 +20,12 @@
 
 :local(.players) {
 	width: 60%;
-    height: 100%;
-	margin-top: 8vh;
+  height: 100%;
+	margin-top: 4vh;
+  margin-bottom: 4vh;
 	position: relative;
 	text-align: center;
+  overflow-y: auto;
 }
 
 :local(.backToRoomButton) {

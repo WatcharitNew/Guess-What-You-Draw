@@ -20,15 +20,10 @@ export const PlayerBox: React.FC<IPlayerBox> = (props: IPlayerBox) => {
 		order = score;
 	}
 
-	const rankStyles = {
-		transform: `translate(0px, ${64 * rank}px)`,
-	};
-
 	return (
 		<div className={styles.wrapPlayerBox}>
 			<div
 				className={classNames(styles.playerBox, userStyle)}
-				style={rankStyles}
 			>
 				<div className={styles.orderSection}>{order}</div>
 				<div className={styles.nameSection}>{name}</div>
