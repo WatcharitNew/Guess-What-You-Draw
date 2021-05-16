@@ -1,0 +1,87 @@
+@import '../variable.scss';
+
+:local(.background) {
+    background-color: rgba($white, 0.5);
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+:local(.chatMessage) {
+    margin-top: 8px;
+}
+
+:local(.chatOtherUserName) {
+    font-size: 18px;
+}
+
+:local(.chatContent) {
+    padding: 8px 16px;
+    border-radius: 24px;
+    width: fit-content;
+    margin-top: 4px;
+    max-width: 100%;
+    word-break: break-all;
+}
+
+:local(.chatUserContent) {
+    margin-left: auto;
+    background-color: $purple;
+    color: $white;
+}
+
+:local(.chatOtherContent) {
+    margin-left: 8px;
+    background-color: $white;
+}
+
+:local(.chatSystemContent) {
+    background-color: rgba($black, 0.25);
+    color: $white;
+    padding: 8px 16px;
+    border-radius: 24px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+:local(.chatMessages) {
+    height: 90%;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+
+    > :first-child {
+        margin-top: auto;
+    }
+
+    > :last-child {
+        margin-top: 2vh;
+    }
+}
+
+:local(.textField) {
+    width: 100%;
+}
+
+:local(.footer) {
+    background-color: $white;
+    height: 12%;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-self: flex-end;
+}
+
+:local(.textFieldWrapper) {
+    background-color: rgba($black, 0.1);
+    margin: 4px 16px;
+    padding-left: 16px;
+    border-radius: 24px;
+    width: 80%;
+}

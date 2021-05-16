@@ -1,0 +1,8 @@
+@import '../variable.scss';
+
+:local(.canvas) {
+	background-color: $white;
+	width: 672px;
+	height: 448px;
+  align-self: center;
+}

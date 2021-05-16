@@ -3,17 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
+    "@rails/actioncable": "^6.1.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "@types/jest": "^26.0.15",
     "@types/node": "^12.0.0",
-    "@types/react": "^16.9.53",
-    "@types/react-dom": "^16.9.8",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "axios": "^0.21.1",
+    "classnames": "^2.2.6",
+    "dotenv": "^8.2.0",
+    "ndarray": "^1.0.19",
+    "node-sass": "4.14.1",
+    "onnxjs": "^0.1.8",
     "react": "^17.0.1",
+    "react-copy-to-clipboard": "^5.0.3",
     "react-dom": "^17.0.1",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
-    "typescript": "^4.0.3",
+    "react-timer-hook": "^2.0.7",
+    "softmax-fn": "^1.0.8",
+    "typescript": "^4.2.3",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
@@ -39,5 +52,11 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/material-ui": "^0.21.8",
+    "@types/react-copy-to-clipboard": "^5.0.0",
+    "@types/react-router": "^5.1.11",
+    "@types/react-router-dom": "^5.1.7"
   }
 }
