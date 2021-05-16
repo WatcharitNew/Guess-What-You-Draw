@@ -1,6 +1,7 @@
-import { Tensor, InferenceSession } from "onnxjs";
-const softmax = require('softmax-fn');
-
+const workercode = () => {
+  const onnx = require('onnxjs');
+  const { InferenceSession } = onnx;
+  const softmax = require('softmax-fn');
 // def preprocess_onnx(inputImage):
 //   outputImage = cv2.cvtColor(inputImage, cv2.COLOR_GRAY2RGB)
 //   outputImage = cv2.resize(outputImage, (224,224))
@@ -93,12 +94,15 @@ const session = new InferenceSession();
 const url = '/50-doodleNet-v4-final.onnx';
 session.loadModel(url);
 
-export const predictImage = (imageGray: number[][]) => {
+
+  // eslint-disable-next-line no-restricted-globals
+  self.onmessage = function(e: MessageEvent) {
     // creating an array of input Tensors is the easiest way. For other options see the API documentation
-    const inputTensor: Tensor = preprocessImage(imageGray);
+    const { imageGray } = e.data;
+    const inputTensor = preprocessImage(imageGray as number[][]);
     
     // run this in an async method:
-    return session.run([inputTensor]).then((outputMap) => {
+    session.run([inputTensor]).then((outputMap: any) => {
         const pred = outputMap.values().next().value.data;
         const softmaxPred = softmax(pred);
         let max = -1;
@@ -109,6 +113,20 @@ export const predictImage = (imageGray: number[][]) => {
                 maxId = idx;
             }
         });
-        return maxId;
+        // eslint-disable-next-line no-restricted-globals
+        self.postMessage({ maxId }, '*')
     });
-}
+  };
+};
+
+// export const predictImage = (imageGray: number[][]) => {
+    
+// }
+
+let code = workercode.toString();
+code = code.substring(code.indexOf("{") + 1, code.lastIndexOf("}"));
+
+const blob = new Blob([code], { type: "application/javascript" });
+const worker_script = URL.createObjectURL(blob);
+
+export default worker_script;

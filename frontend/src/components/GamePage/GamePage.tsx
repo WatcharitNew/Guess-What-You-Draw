@@ -12,7 +12,7 @@ import styles from './GamePage.module.scss';
 import consumer from '../cable';
 import { EndGameModal } from '../NiceModal/EndGameModal';
 import { CorrectPrediction } from '../CorrectPrediction/CorrectPrediction';
-import { predictImage } from './Predictor';
+import worker_script from './Predictor';
 
 interface RouteParams {
 	room: string;
@@ -136,17 +136,31 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 	const onPredictImage = (image: number[][]) => {
 		setGetImageData(false);
 
-		new Promise((resolve, reject) => {
-			resolve(predictImage(image));
-		}).then((predictedImageID) => {
-      const predictedID = predictedImageID as number;
+    const worker = new Worker(worker_script);
+    worker.postMessage(image);
+    worker.onmessage = ev => {
+      console.log("got data back from worker");
+      const { maxId } = ev.data;
+      const predictedID = maxId as number;
       setModelPredictedID(predictedID);
 
 			console.log('model predict: ', classLabel[predictedID]);
 			if(!showCorrectModal && predictedID === wordID) {
 				onDrawedLabelImage();
 			}
-		});
+    };
+
+		// new Promise((resolve, reject) => {
+		// 	resolve(predictImage(image));
+		// }).then((predictedImageID) => {
+    //   const predictedID = predictedImageID as number;
+    //   setModelPredictedID(predictedID);
+
+		// 	console.log('model predict: ', classLabel[predictedID]);
+		// 	if(!showCorrectModal && predictedID === wordID) {
+		// 		onDrawedLabelImage();
+		// 	}
+		// });
 	};
 
 	const onTimeOut = () => {
