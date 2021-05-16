@@ -63,12 +63,14 @@ const GamePageComponent: React.FC<IGamePage> = (props) => {
 		setGameChannel(channel);
 
 		return () => {
-			gameChannel.subscriptions.remove({
-				channel: 'GameChannel',
-				username,
-				room,
-			});
-			setGameChannel(null);
+      if(gameChannel) {
+        gameChannel.subscriptions.remove({
+          channel: 'GameChannel',
+          username,
+          room,
+        });
+        setGameChannel(null);
+      }
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);

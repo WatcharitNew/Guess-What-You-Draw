@@ -66,6 +66,11 @@ class GameChannel < ApplicationCable::Channel
         @@rooms[room][:number_user_end_round] = 0;
         ActionCable.server.broadcast "game_#{room}", {type: 'random-word', word_id: @@rooms[room][:word_id], round: @@rooms[room][:round], rank: (@@rooms[room][:rank].sort {|a1,a2| a2[1]<=>a1[1]}).to_h}
       end
+
+      if(@@rooms[room][:round] > @@rooms[room][:max_round])
+        @@rooms[room] = nil
+        $redis.del(room)
+      end
       
     elsif data['type'] == 'send-message'
       ActionCable.server.broadcast("game_#{room}", {type: 'recieve-message', sender: username, content: data['content']})
@@ -81,14 +86,16 @@ class GameChannel < ApplicationCable::Channel
     puts "param room #{room}"
     puts "room detail #{@@rooms[room]}"
 
-    if @@rooms[room][:active_users].size == @@rooms[room][:all_users].size
-      $redis.del(room)
-    end
-
-    @@rooms[room][:active_users].delete(username)
-
-    if @@rooms[room][:active_users].empty?
-      @@rooms[room] = nil
+    if @@rooms[room].nil?
+      if @@rooms[room][:active_users].size == @@rooms[room][:all_users].size
+        $redis.del(room)
+      end
+  
+      @@rooms[room][:active_users].delete(username)
+  
+      if @@rooms[room][:active_users].empty?
+        @@rooms[room] = nil
+      end
     end
   end
 
